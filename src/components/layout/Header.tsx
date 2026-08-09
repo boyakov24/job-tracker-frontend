@@ -7,24 +7,26 @@ function Header() {
   const { isAuthenticated, logout } = useAuth();
 
   return (
-    <header className="flex items-center justify-between border-b px-6 py-4">
-      <h1 className="text-xl font-bold text-slate-900">
-        Job <span className="text-indigo-600">Tracker</span>
-      </h1>
+    <header className="border-b bg-background">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <h1 className="text-xl font-bold text-slate-900">
+          Job <span className="text-indigo-600">Tracker</span>
+        </h1>
 
-      <div className="flex gap-3">
-        {isAuthenticated ? (
-          <button
-            onClick={logout}
-            className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700 transition-colors duration-200"
-          >
-            Logout
-          </button>
-        ) : (
-          <>
-            <AuthPopover />
-          </>
-        )}
+        <div className="flex gap-3">
+          {isAuthenticated ? (
+            <button
+              onClick={logout}
+              className="rounded-md border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              Logout
+            </button>
+          ) : (
+            <>
+              <AuthPopover />
+            </>
+          )}
+        </div>
       </div>
     </header>
   );
