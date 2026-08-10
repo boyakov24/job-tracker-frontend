@@ -85,7 +85,7 @@ function AuthPopover() {
 
       <PopoverContent
         align="end"
-        className="w-[460px] p-5 bg-white rounded-2xl shadow-xl border border-slate-100"
+        className="w-[400px] p-5 bg-white rounded-2xl shadow-xl border border-slate-100"
       >
         <div className="text-sm text-muted-foreground">
           {mode === "login" ? (

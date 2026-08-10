@@ -20,6 +20,18 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_API_URL,
           changeOrigin: true,
         },
+        "/jobs": {
+          target: env.VITE_API_URL,
+          changeOrigin: true,
+        },
+        "/notes": {
+          target: env.VITE_API_URL,
+          changeOrigin: true,
+        },
+        "/reminders": {
+          target: env.VITE_API_URL,
+          changeOrigin: true,
+        },
       },
     },
   };
