@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { login as loginRequest } from "@/api/auth";
 import { useAuth } from "@/providers/auth-provider";
 import { register as registerRequest } from "@/api/auth";
@@ -11,8 +10,6 @@ import {
 } from "@/components/ui/popover";
 
 function AuthPopover() {
-  const navigate = useNavigate();
-
   const [open, setOpen] = useState(false);
 
   const [email, setEmail] = useState("");
@@ -36,7 +33,6 @@ function AuthPopover() {
     login(response.accessToken);
 
     setOpen(false);
-    navigate("/dashboard");
   }
 
   async function handleRegister(event: React.SubmitEvent<HTMLFormElement>) {
@@ -50,7 +46,6 @@ function AuthPopover() {
     login(response.accessToken);
 
     setOpen(false);
-    navigate("/dashboard");
   }
 
   return (
