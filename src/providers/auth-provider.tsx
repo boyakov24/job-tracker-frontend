@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { getToken, removeToken, setToken } from "@/lib/auth-storage";
 
@@ -18,6 +18,33 @@ type AuthProviderProps = {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [token, setTokenState] = useState<string | null>(getToken());
 
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const expiresAt = payload.exp * 1000;
+      const timeUntilExpiration = expiresAt - Date.now();
+
+      if (timeUntilExpiration <= 0) {
+        logout();
+        return;
+      }
+
+      const timeoutId = window.setTimeout(() => {
+        logout();
+      }, timeUntilExpiration);
+
+      return () => {
+        window.clearTimeout(timeoutId);
+      };
+    } catch {
+      logout();
+    }
+  }, [token]);
+
   function login(newToken: string) {
     setToken(newToken);
     setTokenState(newToken);
@@ -26,6 +53,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   function logout() {
     removeToken();
     setTokenState(null);
+    window.location.href = "/";
   }
 
   return (

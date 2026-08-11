@@ -5,15 +5,8 @@ import { getNotes } from "@/api/notes";
 import { deleteJob } from "@/api/jobs";
 import NoteList from "../notes/NotesList";
 import AddJobDialog from "./AddJobDialog";
-
-type Job = {
-  id: string;
-  company: string;
-  position: string;
-  status: "applied" | "interview" | "offer" | "rejected";
-  applicationUrl: string | null;
-  createdAt: string;
-};
+import type { Job } from "@/types/job";
+import type { Note } from "@/types/note";
 
 type JobListProps = {
   jobs: Job[];
@@ -23,7 +16,7 @@ type JobListProps = {
 function JobList({ jobs, onUpdated }: JobListProps) {
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
 
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [isLoadingNotes, setIsLoadingNotes] = useState(false);
 
   const [editingJob, setEditingJob] = useState<Job | null>(null);

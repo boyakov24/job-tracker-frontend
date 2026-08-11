@@ -1,32 +1,37 @@
 import { http } from "./http";
 
+import type { Note } from "@/types/note";
+
 type CreateNoteData = {
   jobId: string;
   content: string;
 };
 
 export async function getNotes(jobId: string) {
-  const response = await http.get(`/jobs/${jobId}/notes`);
+  const response = await http.get<Note[]>(`/jobs/${jobId}/notes`);
 
   return response.data;
 }
 
-export async function createNote(data: CreateNoteData) {
-  const response = await http.post(`/jobs/${data.jobId}/notes`, {
+export async function createNote(data: CreateNoteData): Promise<Note> {
+  const response = await http.post<Note>(`/jobs/${data.jobId}/notes`, {
     content: data.content,
   });
 
   return response.data;
 }
 
-export async function getNote(noteId: string) {
-  const response = await http.get(`/notes/${noteId}`);
+export async function getNote(noteId: string): Promise<Note> {
+  const response = await http.get<Note>(`/notes/${noteId}`);
 
   return response.data;
 }
 
-export async function updateNote(noteId: string, content: string) {
-  const response = await http.patch(`/notes/${noteId}`, {
+export async function updateNote(
+  noteId: string,
+  content: string,
+): Promise<Note> {
+  const response = await http.patch<Note>(`/notes/${noteId}`, {
     content,
   });
 

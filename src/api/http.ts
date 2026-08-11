@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken } from "@/lib/auth-storage";
+import { getToken, removeToken } from "@/lib/auth-storage";
 
 export const http = axios.create({
   baseURL: "/",
@@ -17,3 +17,15 @@ http.interceptors.request.use((config) => {
 
   return config;
 });
+
+http.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      removeToken();
+      window.location.href = "/";
+    }
+
+    return Promise.reject(error);
+  },
+);

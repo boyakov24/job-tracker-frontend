@@ -15,10 +15,15 @@ type CreateReminderData = {
   remindAt: string;
 };
 
-export async function createReminder(data: CreateReminderData) {
-  const response = await http.post(`/notes/${data.noteId}/reminders`, {
-    remindAt: data.remindAt,
-  });
+export async function createReminder(
+  data: CreateReminderData,
+): Promise<Reminder> {
+  const response = await http.post<Reminder>(
+    `/notes/${data.noteId}/reminders`,
+    {
+      remindAt: data.remindAt,
+    },
+  );
 
   return response.data;
 }
@@ -37,14 +42,17 @@ export async function getReminder(noteId: string): Promise<Reminder | null> {
   }
 }
 
-export async function getReminderById(reminderId: string) {
-  const response = await http.get(`/reminders/${reminderId}`);
+export async function getReminderById(reminderId: string): Promise<Reminder> {
+  const response = await http.get<Reminder>(`/reminders/${reminderId}`);
 
   return response.data;
 }
 
-export async function updateReminder(reminderId: string, remindAt: string) {
-  const response = await http.patch(`/reminders/${reminderId}`, {
+export async function updateReminder(
+  reminderId: string,
+  remindAt: string,
+): Promise<Reminder> {
+  const response = await http.patch<Reminder>(`/reminders/${reminderId}`, {
     remindAt,
   });
 

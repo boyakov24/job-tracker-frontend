@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+import type { Job, JobStatus } from "@/types/job";
 import { createJob, updateJob } from "@/api/jobs";
 import {
   Dialog,
@@ -8,16 +9,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-type JobStatus = "applied" | "interview" | "offer" | "rejected";
-
-type Job = {
-  id: string;
-  company: string;
-  position: string;
-  status: JobStatus;
-  applicationUrl: string | null;
-};
 
 type AddJobDialogProps = {
   open: boolean;
@@ -35,9 +26,7 @@ function AddJobDialog({
   const [company, setCompany] = useState("");
   const [position, setPosition] = useState("");
   const [applicationUrl, setApplicationUrl] = useState("");
-  const [status, setStatus] = useState<
-    "applied" | "interview" | "offer" | "rejected"
-  >("applied");
+  const [status, setStatus] = useState<JobStatus>("applied");
 
   useEffect(() => {
     if (job) {
@@ -138,15 +127,7 @@ function AddJobDialog({
               <select
                 id="status"
                 value={status}
-                onChange={(event) =>
-                  setStatus(
-                    event.target.value as
-                      | "applied"
-                      | "interview"
-                      | "offer"
-                      | "rejected",
-                  )
-                }
+                onChange={(event) => setStatus(event.target.value as JobStatus)}
                 className="w-full appearance-none rounded-lg border border-slate-200 px-3.5 py-2.5 pr-10 text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
               >
                 <option value="applied">Applied</option>

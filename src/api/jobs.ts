@@ -1,7 +1,9 @@
 import { http } from "./http";
 
+import type { Job, JobStatus, JobsResponse } from "@/types/job";
+
 export async function getJobs() {
-  const response = await http.get("/jobs");
+  const response = await http.get<JobsResponse>("/jobs");
 
   return response.data;
 }
@@ -9,12 +11,12 @@ export async function getJobs() {
 type CreateJobData = {
   company: string;
   position: string;
-  status?: "applied" | "interview" | "offer" | "rejected";
+  status?: JobStatus;
   applicationUrl?: string;
 };
 
-export async function createJob(data: CreateJobData) {
-  const response = await http.post("/jobs", data);
+export async function createJob(data: CreateJobData): Promise<Job> {
+  const response = await http.post<Job>("/jobs", data);
 
   return response.data;
 }
@@ -24,11 +26,11 @@ export async function updateJob(
   data: {
     company?: string;
     position?: string;
-    status?: "applied" | "interview" | "offer" | "rejected";
+    status?: JobStatus;
     applicationUrl?: string;
   },
-) {
-  const response = await http.patch(`/jobs/${jobId}`, data);
+): Promise<Job> {
+  const response = await http.patch<Job>(`/jobs/${jobId}`, data);
 
   return response.data;
 }

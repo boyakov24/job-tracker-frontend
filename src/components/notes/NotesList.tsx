@@ -3,12 +3,7 @@ import { useState, useEffect } from "react";
 import { createNote, updateNote, deleteNote } from "@/api/notes";
 import ReminderDialog from "../reminders/ReminderDialog";
 import { getReminder, type Reminder } from "@/api/reminders";
-
-type Note = {
-  id: string;
-  content: string;
-  createdAt: string;
-};
+import type { Note } from "@/types/note";
 
 type NoteListProps = {
   jobId: string;

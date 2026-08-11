@@ -1,4 +1,4 @@
-type JobStatus = "applied" | "interview" | "offer" | "rejected";
+import type { JobStatus } from "@/types/job";
 
 type StatusBadgeProps = {
   status: JobStatus;
@@ -11,17 +11,10 @@ const statusStyles: Record<JobStatus, string> = {
   rejected: "bg-rose-50 text-rose-600",
 };
 
-const statusLabels: Record<JobStatus, string> = {
-  applied: "Applied",
-  interview: "Interview",
-  offer: "Offer",
-  rejected: "Rejected",
-};
-
 function StatusBadge({ status }: StatusBadgeProps) {
   return (
     <span
-      className={`inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-sm font-medium ${statusStyles[status]}`}
+      className={`inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 capitalize text-sm font-medium ${statusStyles[status]}`}
     >
       <span
         className={`h-1.5 w-1.5 rounded-full ${
@@ -35,7 +28,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
         }`}
       />
 
-      {statusLabels[status]}
+      {status}
     </span>
   );
 }
