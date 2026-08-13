@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import ValidatedInput from "../ui/validated-input";
 
 type AddJobDialogProps = {
   open: boolean;
@@ -26,9 +27,18 @@ function AddJobDialog({
   const [company, setCompany] = useState("");
   const [position, setPosition] = useState("");
   const [applicationUrl, setApplicationUrl] = useState("");
+
+  const [companyError, setCompanyError] = useState("");
+  const [positionError, setPositionError] = useState("");
+  const [applicationUrlError, setApplicationUrlError] = useState("");
+
   const [status, setStatus] = useState<JobStatus>("applied");
 
   useEffect(() => {
+    setCompanyError("");
+    setPositionError("");
+    setApplicationUrlError("");
+
     if (job) {
       setCompany(job.company);
       setPosition(job.position);
@@ -45,20 +55,40 @@ function AddJobDialog({
   const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    let hasError = false;
+
+    if (!company.trim()) {
+      setCompanyError("This field is required");
+      hasError = true;
+    } else {
+      setCompanyError("");
+    }
+
+    if (!position.trim()) {
+      setPositionError("This field is required");
+      hasError = true;
+    } else {
+      setPositionError("");
+    }
+
+    if (hasError) {
+      return;
+    }
+
     try {
       if (job) {
         await updateJob(job.id, {
-          company,
-          position,
+          company: company.trim(),
+          position: position.trim(),
           status,
-          applicationUrl: applicationUrl || undefined,
+          applicationUrl: applicationUrl.trim(),
         });
       } else {
         await createJob({
-          company,
-          position,
+          company: company.trim(),
+          position: position.trim(),
           status,
-          applicationUrl: applicationUrl || undefined,
+          applicationUrl: applicationUrl.trim() || undefined,
         });
       }
 
@@ -67,11 +97,24 @@ function AddJobDialog({
       setStatus("applied");
       setApplicationUrl("");
 
+      setCompanyError("");
+      setPositionError("");
+      setApplicationUrlError("");
+
       onOpenChange(false);
       onCreated();
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error("Backend validation:", error.response?.data?.message);
+        const message = error.response?.data?.message;
+
+        console.error("Backend validation:", message);
+
+        if (
+          Array.isArray(message) &&
+          message.some((item) => item.includes("applicationUrl"))
+        ) {
+          setApplicationUrlError("URL is invalid");
+        }
       } else {
         console.error("Unknown error:", error);
       }
@@ -90,19 +133,21 @@ function AddJobDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div className="flex flex-col gap-1.5">
             <label htmlFor="company" className="text-sm font-medium">
               Company
             </label>
 
-            <input
+            <ValidatedInput
               id="company"
               value={company}
-              onChange={(event) => setCompany(event.target.value)}
+              onChange={(event) => {
+                setCompany(event.target.value);
+                setCompanyError("");
+              }}
               placeholder="e.g. Google"
-              required
-              className="rounded-lg border border-slate-200 px-3.5 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+              error={companyError}
             />
           </div>
 
@@ -111,13 +156,15 @@ function AddJobDialog({
               Position
             </label>
 
-            <input
+            <ValidatedInput
               id="position"
               value={position}
-              onChange={(event) => setPosition(event.target.value)}
+              onChange={(event) => {
+                setPosition(event.target.value);
+                setPositionError("");
+              }}
               placeholder="e.g. Backend Developer"
-              required
-              className="rounded-lg border border-slate-200 px-3.5 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+              error={positionError}
             />
           </div>
 
@@ -149,13 +196,16 @@ function AddJobDialog({
               Application URL
             </label>
 
-            <input
+            <ValidatedInput
               id="applicationUrl"
               type="url"
               value={applicationUrl}
-              onChange={(event) => setApplicationUrl(event.target.value)}
+              onChange={(event) => {
+                setApplicationUrl(event.target.value);
+                setApplicationUrlError("");
+              }}
               placeholder="https://..."
-              className="rounded-lg border border-slate-200 px-3.5 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+              error={applicationUrlError}
             />
           </div>
 

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { login as loginRequest } from "@/api/auth";
 import { useAuth } from "@/providers/auth-provider";
 import { register as registerRequest } from "@/api/auth";
+import ValidatedInput from "../ui/validated-input";
 
 import {
   Popover,
@@ -15,8 +16,14 @@ function AuthPopover() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
+
+  const [registerEmailError, setRegisterEmailError] = useState("");
+  const [registerPasswordError, setRegisterPasswordError] = useState("");
 
   const { login } = useAuth();
 
@@ -25,31 +32,117 @@ function AuthPopover() {
   async function handleLogin(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const response = await loginRequest({
-      email,
-      password,
-    });
+    let hasError = false;
 
-    login(response.accessToken);
+    if (!email.trim()) {
+      setEmailError("This field is required");
+      hasError = true;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError("Email is invalid");
+      hasError = true;
+    } else {
+      setEmailError("");
+    }
 
-    setOpen(false);
+    if (!password.trim()) {
+      setPasswordError("This field is required");
+      hasError = true;
+    } else if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      hasError = true;
+    } else {
+      setPasswordError("");
+    }
+
+    if (hasError) {
+      return;
+    }
+
+    try {
+      const response = await loginRequest({
+        email,
+        password,
+      });
+
+      login(response.accessToken);
+      setOpen(false);
+    } catch (error) {
+      console.error("Login failed:", error);
+
+      setPasswordError("Invalid email or password");
+    }
   }
 
   async function handleRegister(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const response = await registerRequest({
-      email: registerEmail,
-      password: registerPassword,
-    });
+    let hasError = false;
 
-    login(response.accessToken);
+    if (!registerEmail.trim()) {
+      setRegisterEmailError("This field is required");
+      hasError = true;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(registerEmail)) {
+      setRegisterEmailError("Email is invalid");
+      hasError = true;
+    } else {
+      setRegisterEmailError("");
+    }
 
-    setOpen(false);
+    if (!registerPassword.trim()) {
+      setRegisterPasswordError("This field is required");
+      hasError = true;
+    } else if (registerPassword.length < 6) {
+      setRegisterPasswordError("Password must be at least 6 characters");
+      hasError = true;
+    } else {
+      setRegisterPasswordError("");
+    }
+
+    if (hasError) {
+      return;
+    }
+
+    try {
+      const response = await registerRequest({
+        email: registerEmail,
+        password: registerPassword,
+      });
+
+      login(response.accessToken);
+
+      setOpen(false);
+    } catch (error) {
+      console.error("Registration failed:", error);
+
+      setRegisterEmailError("This email is already registered");
+    }
   }
 
+  const resetPopoverState = () => {
+    setEmail("");
+    setPassword("");
+
+    setEmailError("");
+    setPasswordError("");
+
+    setRegisterEmail("");
+    setRegisterPassword("");
+
+    setRegisterEmailError("");
+    setRegisterPasswordError("");
+  };
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(open) => {
+        if (!open) {
+          resetPopoverState();
+        }
+
+        setOpen(open);
+      }}
+    >
       <PopoverTrigger asChild>
         <div className="flex gap-2">
           <button
@@ -85,17 +178,24 @@ function AuthPopover() {
       >
         <div className="text-sm text-muted-foreground">
           {mode === "login" ? (
-            <form onSubmit={handleLogin} className="flex flex-col gap-5">
+            <form
+              onSubmit={handleLogin}
+              noValidate
+              className="flex flex-col gap-5"
+            >
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-slate-700">
                   Email
                 </label>
-                <input
+                <ValidatedInput
                   type="email"
                   placeholder="example@mail.com"
                   value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setEmailError("");
+                  }}
+                  error={emailError}
                 />
               </div>
 
@@ -103,12 +203,15 @@ function AuthPopover() {
                 <label className="text-sm font-medium text-slate-700">
                   Password
                 </label>
-                <input
+                <ValidatedInput
                   type="password"
-                  placeholder="******"
+                  placeholder="••••••"
                   value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    setPasswordError("");
+                  }}
+                  error={passwordError}
                 />
               </div>
 
@@ -120,17 +223,24 @@ function AuthPopover() {
               </button>
             </form>
           ) : (
-            <form onSubmit={handleRegister} className="flex flex-col gap-5">
+            <form
+              onSubmit={handleRegister}
+              noValidate
+              className="flex flex-col gap-5"
+            >
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-slate-700">
                   Email
                 </label>
-                <input
+                <ValidatedInput
                   type="email"
                   placeholder="example@mail.com"
                   value={registerEmail}
-                  onChange={(event) => setRegisterEmail(event.target.value)}
-                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  onChange={(event) => {
+                    setRegisterEmail(event.target.value);
+                    setRegisterEmailError("");
+                  }}
+                  error={registerEmailError}
                 />
               </div>
 
@@ -138,12 +248,15 @@ function AuthPopover() {
                 <label className="text-sm font-medium text-slate-700">
                   Password
                 </label>
-                <input
+                <ValidatedInput
                   type="password"
-                  placeholder="******"
+                  placeholder="••••••"
                   value={registerPassword}
-                  onChange={(event) => setRegisterPassword(event.target.value)}
-                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  onChange={(event) => {
+                    setRegisterPassword(event.target.value);
+                    setRegisterPasswordError("");
+                  }}
+                  error={registerPasswordError}
                 />
               </div>
 

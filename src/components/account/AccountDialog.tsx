@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/providers/auth-provider";
 import { updateProfile, changePassword, deleteAccount } from "@/api/users";
+import ValidatedInput from "../ui/validated-input";
 
 type AccountDialogProps = {
   open: boolean;
@@ -21,6 +22,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
   const [email, setEmail] = useState("");
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [emailError, setEmailError] = useState("");
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -29,14 +31,10 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
 
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [currentPasswordError, setCurrentPasswordError] = useState("");
+  const [newPasswordError, setNewPasswordError] = useState("");
 
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      setEmail(user.email);
-    }
-  }, [user, open]);
 
   const resetDialogState = () => {
     setEmail(user?.email ?? "");
@@ -51,10 +49,35 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
 
     setShowCurrentPassword(false);
     setShowNewPassword(false);
+
+    setEmailError("");
+    setCurrentPasswordError("");
+    setNewPasswordError("");
   };
 
   const handleUpdateEmail = async () => {
-    if (!email.trim() || isUpdatingEmail) {
+    if (isUpdatingEmail) {
+      return;
+    }
+
+    let hasError = false;
+
+    if (!email.trim()) {
+      setEmailError("This field is required");
+      hasError = true;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError("Email is invalid");
+      hasError = true;
+    } else if (
+      email.trim().toLowerCase() === user?.email.trim().toLowerCase()
+    ) {
+      setEmailError("Required a new email");
+      hasError = true;
+    } else {
+      setEmailError("");
+    }
+
+    if (hasError) {
       return;
     }
 
@@ -66,21 +89,47 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
       });
 
       updateUser(updatedUser);
-
       setIsEditingEmail(false);
     } catch (error) {
       console.error("Failed to update email:", error);
+
+      setEmailError("Failed to update email");
     } finally {
       setIsUpdatingEmail(false);
     }
   };
 
   const handleChangePassword = async () => {
-    if (!currentPassword.trim() || !newPassword.trim()) {
+    if (isChangingPassword) {
       return;
     }
 
-    if (isChangingPassword) {
+    let hasError = false;
+
+    if (!currentPassword.trim()) {
+      setCurrentPasswordError("This field is required");
+      hasError = true;
+    } else if (currentPassword.length < 6) {
+      setCurrentPassword("Password must be at least 6 characters");
+      hasError = true;
+    } else {
+      setCurrentPasswordError("");
+    }
+
+    if (!newPassword.trim()) {
+      setNewPasswordError("This field is required");
+      hasError = true;
+    } else if (newPassword.length < 6) {
+      setCurrentPasswordError("Password must be at least 6 characters");
+      hasError = true;
+    } else if (newPassword.trim() === currentPassword.trim()) {
+      setNewPasswordError("Required a new password");
+      hasError = true;
+    } else {
+      setNewPasswordError("");
+    }
+
+    if (hasError) {
       return;
     }
 
@@ -94,9 +143,13 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
 
       setCurrentPassword("");
       setNewPassword("");
+      setCurrentPasswordError("");
+      setNewPasswordError("");
       setIsEditingPassword(false);
     } catch (error) {
       console.error("Failed to change password:", error);
+
+      setCurrentPasswordError("Current password is incorrect");
     } finally {
       setIsChangingPassword(false);
     }
@@ -131,12 +184,15 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
   const handleCancel = () => {
     setEmail(user?.email ?? "");
     setIsEditingEmail(false);
+    setEmailError("");
   };
 
   const handleCancelPassword = () => {
     setCurrentPassword("");
     setNewPassword("");
     setIsEditingPassword(false);
+    setCurrentPasswordError("");
+    setNewPasswordError("");
   };
 
   return (
@@ -182,20 +238,24 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
             </div>
           ) : (
             <div className="flex w-full items-center gap-2">
-              <input
+              <ValidatedInput
                 id="account-email"
                 type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                //value={email}
+                placeholder="Enter a new email"
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setEmailError("");
+                }}
                 disabled={isUpdatingEmail}
-                className="flex-1 rounded-lg border border-slate-200 px-3.5 py-2.5 text-base text-slate-900 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
+                error={emailError}
               />
 
               <div className="flex shrink-0 items-center gap-1.5">
                 <button
                   type="button"
                   onClick={handleUpdateEmail}
-                  disabled={isUpdatingEmail || !email}
+                  disabled={isUpdatingEmail || !email.trim()}
                   className="flex h-8 w-8 items-center justify-center rounded-full text-[#34d399] transition-colors duration-200 hover:bg-[#34d399]/10 disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label="Save email"
                 >
@@ -220,7 +280,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
 
           {!isEditingPassword ? (
             <div className="flex items-center gap-2 h-[42px]">
-              <p className="text-lg text-slate-500">••••••••</p>
+              <p className="text-lg text-slate-500">••••••</p>
 
               <button
                 type="button"
@@ -234,18 +294,21 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
           ) : (
             <div className="space-y-3">
               <div className="relative">
-                <input
+                <ValidatedInput
                   type={showCurrentPassword ? "text" : "password"}
                   value={currentPassword}
-                  onChange={(event) => setCurrentPassword(event.target.value)}
+                  onChange={(event) => {
+                    setCurrentPassword(event.target.value);
+                    setCurrentPasswordError("");
+                  }}
                   placeholder="Current password"
-                  className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 pr-11 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  error={currentPasswordError}
                 />
 
                 <button
                   type="button"
                   onClick={() => setShowCurrentPassword((value) => !value)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
                   aria-label={
                     showCurrentPassword
                       ? "Hide current password"
@@ -261,18 +324,21 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
               </div>
 
               <div className="relative">
-                <input
+                <ValidatedInput
                   type={showNewPassword ? "text" : "password"}
                   value={newPassword}
-                  onChange={(event) => setNewPassword(event.target.value)}
+                  onChange={(event) => {
+                    setNewPassword(event.target.value);
+                    setNewPasswordError("");
+                  }}
                   placeholder="New password"
-                  className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 pr-11 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  error={newPasswordError}
                 />
 
                 <button
                   type="button"
                   onClick={() => setShowNewPassword((value) => !value)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
                   aria-label={
                     showNewPassword ? "Hide new password" : "Show new password"
                   }
