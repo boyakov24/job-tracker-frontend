@@ -32,6 +32,10 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_API_URL,
           changeOrigin: true,
         },
+        "/users": {
+          target: env.VITE_API_URL,
+          changeOrigin: true,
+        },
       },
     },
   };

@@ -58,6 +58,14 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
   };
 
   const handleDelete = async (noteId: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this reminder?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     await deleteNote(noteId);
 
     onCreated();
@@ -96,7 +104,7 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
               maxLength={5000}
               placeholder="Write a note..."
               rows={3}
-              className="min-h-20 flex-1 resize-y rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+              className="min-h-20 flex-1 resize-y rounded-md border border-slate-200 px-3 py-2 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             />
 
             <div className="flex items-center gap-1.5 pt-2 shrink-0">

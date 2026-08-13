@@ -81,6 +81,7 @@ function AuthPopover() {
       <PopoverContent
         align="end"
         className="w-[400px] p-5 bg-white rounded-2xl shadow-xl border border-slate-100"
+        onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <div className="text-sm text-muted-foreground">
           {mode === "login" ? (
@@ -94,7 +95,7 @@ function AuthPopover() {
                   placeholder="example@mail.com"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                 />
               </div>
 
@@ -107,7 +108,7 @@ function AuthPopover() {
                   placeholder="******"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                 />
               </div>
 
@@ -129,7 +130,7 @@ function AuthPopover() {
                   placeholder="example@mail.com"
                   value={registerEmail}
                   onChange={(event) => setRegisterEmail(event.target.value)}
-                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                 />
               </div>
 
@@ -142,7 +143,7 @@ function AuthPopover() {
                   placeholder="******"
                   value={registerPassword}
                   onChange={(event) => setRegisterPassword(event.target.value)}
-                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                 />
               </div>
 

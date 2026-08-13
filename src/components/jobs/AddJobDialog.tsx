@@ -80,7 +80,10 @@ function AddJobDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl shadow-slate-200/50">
+      <DialogContent
+        className="sm:max-w-[425px] rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl shadow-slate-200/50"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader className="mb-4">
           <DialogTitle className="text-xl font-bold tracking-tight text-[#0f172a]">
             {job ? "Edit job" : "Add job"}
@@ -99,7 +102,7 @@ function AddJobDialog({
               onChange={(event) => setCompany(event.target.value)}
               placeholder="e.g. Google"
               required
-              className="rounded-lg border border-slate-200 px-3.5 py-2.5 text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+              className="rounded-lg border border-slate-200 px-3.5 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
 
@@ -114,7 +117,7 @@ function AddJobDialog({
               onChange={(event) => setPosition(event.target.value)}
               placeholder="e.g. Backend Developer"
               required
-              className="rounded-lg border border-slate-200 px-3.5 py-2.5 text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+              className="rounded-lg border border-slate-200 px-3.5 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
 
@@ -152,7 +155,7 @@ function AddJobDialog({
               value={applicationUrl}
               onChange={(event) => setApplicationUrl(event.target.value)}
               placeholder="https://..."
-              className="rounded-lg border border-slate-200 px-3.5 py-2.5 text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+              className="rounded-lg border border-slate-200 px-3.5 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
 

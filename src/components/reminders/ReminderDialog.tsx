@@ -102,7 +102,10 @@ function ReminderDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[350px] rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl shadow-slate-200/50">
+      <DialogContent
+        className="sm:max-w-[350px] rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl shadow-slate-200/50"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader className="mb-4">
           <DialogTitle className="text-xl font-bold tracking-tight text-[#0f172a]">
             {reminder ? "Edit reminder" : "Set reminder"}
