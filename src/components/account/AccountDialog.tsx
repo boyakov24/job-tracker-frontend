@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
 import {
@@ -37,7 +37,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   const resetDialogState = () => {
-    setEmail(user?.email ?? "");
+    setEmail("");
 
     setIsEditingEmail(false);
     setIsUpdatingEmail(false);
@@ -182,7 +182,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
   };
 
   const handleCancel = () => {
-    setEmail(user?.email ?? "");
+    setEmail("");
     setIsEditingEmail(false);
     setEmailError("");
   };
@@ -207,11 +207,11 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
       }}
     >
       <DialogContent
-        className="sm:max-w-[400px] rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl shadow-slate-200/50"
+        className="sm:max-w-[400px] rounded-2xl border border-app-slate-200 bg-app-white p-6 shadow-xl shadow-slate-200/50"
         onOpenAutoFocus={(event) => event.preventDefault()}
       >
         <DialogHeader className="mb-4">
-          <DialogTitle className="text-xl font-bold tracking-tight text-[#0f172a]">
+          <DialogTitle className="text-xl font-bold tracking-tight text-app-slate-900">
             Account
           </DialogTitle>
         </DialogHeader>
@@ -221,7 +221,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
 
           {!isEditingEmail ? (
             <div className="flex h-[42px] items-center gap-2">
-              <p className="text-lg text-slate-500">
+              <p className="text-lg text-app-slate-500">
                 {user?.email ?? "Loading..."}
               </p>
 
@@ -229,7 +229,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
                 <button
                   type="button"
                   onClick={() => setIsEditingEmail(true)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full transition-colors duration-200 hover:bg-indigo-500/10"
+                  className="flex h-8 w-8 items-center justify-center rounded-full transition-colors duration-200 hover:bg-app-hover-indigo"
                   aria-label="Edit email"
                 >
                   <span className="text-sm">✏️</span>
@@ -256,7 +256,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
                   type="button"
                   onClick={handleUpdateEmail}
                   disabled={isUpdatingEmail || !email.trim()}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-[#34d399] transition-colors duration-200 hover:bg-[#34d399]/10 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-app-emerald-400 transition-colors duration-200 hover:bg-app-hover-emerald disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label="Save email"
                 >
                   <span className="text-md font-bold">✓</span>
@@ -266,7 +266,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
                   type="button"
                   onClick={handleCancel}
                   disabled={isUpdatingEmail}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-rose-600 transition-colors duration-200 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-app-rose-600 transition-colors duration-200 hover:bg-app-hover-rose disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label="Cancel"
                 >
                   <span className="text-md font-bold">✕</span>
@@ -280,12 +280,12 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
 
           {!isEditingPassword ? (
             <div className="flex items-center gap-2 h-[42px]">
-              <p className="text-lg text-slate-500">••••••</p>
+              <p className="text-lg text-app-slate-500">••••••</p>
 
               <button
                 type="button"
                 onClick={() => setIsEditingPassword(true)}
-                className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-indigo-500/10 transition-colors duration-200"
+                className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-app-hover-indigo transition-colors duration-200"
                 aria-label="Change password"
               >
                 <span className="text-sm">✏️</span>
@@ -308,7 +308,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
                 <button
                   type="button"
                   onClick={() => setShowCurrentPassword((value) => !value)}
-                  className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-3 text-app-slate-400 hover:text-app-slate-600"
                   aria-label={
                     showCurrentPassword
                       ? "Hide current password"
@@ -338,7 +338,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
                 <button
                   type="button"
                   onClick={() => setShowNewPassword((value) => !value)}
-                  className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-3 text-app-slate-400 hover:text-app-slate-600"
                   aria-label={
                     showNewPassword ? "Hide new password" : "Show new password"
                   }
@@ -360,7 +360,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
                     !currentPassword.trim() ||
                     !newPassword.trim()
                   }
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-[#34d399] hover:bg-[#34d399]/10 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-app-emerald-400 hover:bg-app-hover-emerald transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Save password"
                 >
                   <span className="text-md font-bold">✓</span>
@@ -370,7 +370,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
                   type="button"
                   onClick={handleCancelPassword}
                   disabled={isChangingPassword}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-rose-600 hover:bg-rose-50 transition-colors duration-200 disabled:opacity-50"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-app-rose-600 hover:bg-app-hover-rose transition-colors duration-200 disabled:opacity-50"
                   aria-label="Cancel"
                 >
                   <span className="text-md font-bold">✕</span>
@@ -380,7 +380,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
           )}
         </div>
         <div className="mt-2 border-t border-slate-200 pt-5">
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-app-slate-500">
             Permanently delete your account and all associated data.
           </p>
 
@@ -388,7 +388,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
             type="button"
             onClick={handleDeleteAccount}
             disabled={isDeletingAccount}
-            className="mt-4 rounded-lg border border-rose-200 px-4 py-2 text-sm font-medium text-rose-600 transition-colors duration-200 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-4 rounded-lg border border-app-rose-200 px-4 py-2 text-sm font-medium text-app-rose-600 transition-colors duration-200 hover:bg-app-hover-rose disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isDeletingAccount ? "Deleting..." : "Delete account"}
           </button>

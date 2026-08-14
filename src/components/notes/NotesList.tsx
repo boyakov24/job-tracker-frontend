@@ -93,10 +93,10 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-semibold">Notes</h3>
+      <h3 className="text-sm font-medium">Notes</h3>
 
       {(isCreating || editingNoteId !== null) && (
-        <div className="rounded-md border bg-background p-3">
+        <div className="rounded-md border bg-app-bg-color p-3">
           <div className="flex items-start gap-3">
             <textarea
               value={content}
@@ -104,7 +104,7 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
               maxLength={5000}
               placeholder="Write a note..."
               rows={3}
-              className="min-h-20 flex-1 resize-y rounded-md border border-slate-200 px-3 py-2 text-base text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+              className="min-h-20 flex-1 resize-y rounded-md border border-slate-200 px-3 py-2 text-base text-app-slate-900 placeholder-app-slate-400 outline-none transition-all focus:border-app-indigo-500 focus:ring-2 focus:ring-app-indigo-500/20"
             />
 
             <div className="flex items-center gap-1.5 pt-2 shrink-0">
@@ -113,7 +113,7 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
                 onClick={() =>
                   editingNoteId ? handleEdit(editingNoteId) : handleCreate()
                 }
-                className="flex h-8 w-8 items-center justify-center rounded-full text-[#34d399] hover:bg-[#34d399]/10 transition-colors duration-200"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-app-emerald-400 hover:bg-app-hover-emerald transition-colors duration-200"
                 aria-label="Save note"
               >
                 <span className="text-md"> ✓ </span>
@@ -122,7 +122,7 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
               <button
                 type="button"
                 onClick={handleCancel}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-rose-600 hover:bg-rose-50 transition-colors duration-200"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-app-rose-600 hover:bg-app-hover-rose transition-colors duration-200"
                 aria-label="Cancel"
               >
                 <span className="text-md">✕</span>
@@ -147,7 +147,7 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
         return (
           <div
             key={note.id}
-            className={`flex items-start justify-between gap-4 rounded-md border bg-background p-3 ${reminders[note.id]?.sentAt ? "opacity-60" : ""}`}
+            className={`flex items-start justify-between gap-4 rounded-md border bg-app-bg-color p-3 ${reminders[note.id]?.sentAt ? "opacity-60" : ""}`}
           >
             <div>
               <p className="text-sm">{note.content}</p>
@@ -160,7 +160,7 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
             <div className="flex shrink-0 items-center gap-1 pt-1">
               {reminders[note.id]?.sentAt ? (
                 <>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#34d399]/10 px-2.5 py-1 text-sm font-medium text-[#10b981]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-app-emerald-400/10 px-2.5 py-1 text-sm font-medium text-app-emerald-500">
                     ✓ Completed ·{" "}
                     {new Date(reminders[note.id]!.remindAt).toLocaleString(
                       "en-US",
@@ -183,7 +183,7 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
                       setEditingNoteId(note.id);
                       setIsCreating(false);
                     }}
-                    className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[#4f46e5]/10 transition-colors duration-200"
+                    className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-app-hover-indigo transition-colors duration-200"
                     aria-label="Edit note"
                   >
                     <span className="text-md">✏️</span>
@@ -192,7 +192,7 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
                   <button
                     type="button"
                     onClick={() => setReminderNoteId(note.id)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[#d97706]/10 transition-colors duration-200"
+                    className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-app-hover-amber transition-colors duration-200"
                     aria-label={
                       reminders[note.id] ? "Edit reminder" : "Set reminder"
                     }
@@ -201,7 +201,7 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
                   </button>
 
                   {reminders[note.id] && (
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-app-slate-500">
                       {new Date(reminders[note.id]!.remindAt).toLocaleString(
                         "en-US",
                         {
@@ -220,7 +220,7 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
               <button
                 type="button"
                 onClick={() => handleDelete(note.id)}
-                className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-rose-50 transition-colors duration-200"
+                className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-app-hover-rose transition-colors duration-200"
               >
                 <span className="text-md">🗑</span>
               </button>
@@ -232,7 +232,7 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
         <button
           type="button"
           onClick={() => setIsCreating(true)}
-          className="text-sm font-medium text-indigo-500 hover:text-indigo-700 transition-colors duration-200"
+          className="text-sm font-medium text-app-indigo-500 hover:text-app-indigo-700 transition-colors duration-200"
         >
           + Create Note
         </button>

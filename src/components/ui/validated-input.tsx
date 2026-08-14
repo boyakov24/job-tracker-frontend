@@ -15,14 +15,14 @@ function ValidatedInput({
     <div className="space-y-1.5">
       <input
         {...props}
-        className={`w-full rounded-lg border px-3.5 py-2.5 text-base text-slate-900 placeholder-slate-400 outline-none transition-all ${
+        className={`w-full rounded-lg border px-3.5 py-2.5 text-base text-app-slate-900 placeholder-app-slate-400 outline-none transition-all ${
           hasError
-            ? "border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20"
-            : "border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+            ? "border-app-rose-400 focus:border-app-rose-500 focus:ring-2 focus:ring-app-rose-500/20"
+            : "border-slate-200 focus:border-app-indigo-500 focus:ring-2 focus:ring-app-indigo-500/20"
         } ${className}`}
       />
 
-      {hasError && <p className="text-sm text-rose-600">{error}</p>}
+      {hasError && <p className="text-sm text-app-rose-600">{error}</p>}
     </div>
   );
 }

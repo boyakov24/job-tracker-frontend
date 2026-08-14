@@ -147,7 +147,7 @@ function AuthPopover() {
         <div className="flex gap-2">
           <button
             type="button"
-            className="rounded-md border mr-2 px-4 py-2 text-indigo-600 hover:bg-slate-100 transition-colors duration-200"
+            className="rounded-md border mr-2 px-4 py-2 text-app-indigo-600 hover:bg-app-slate-100 transition-colors duration-200"
             onClick={(e) => {
               e.stopPropagation();
               setMode("login");
@@ -159,7 +159,7 @@ function AuthPopover() {
 
           <button
             type="button"
-            className="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 transition-colors duration-200"
+            className="rounded-md bg-app-indigo-600 px-4 py-2 text-app-white hover:bg-app-indigo-700 transition-colors duration-200"
             onClick={(e) => {
               e.stopPropagation();
               setMode("register");
@@ -173,7 +173,7 @@ function AuthPopover() {
 
       <PopoverContent
         align="end"
-        className="w-[400px] p-5 bg-white rounded-2xl shadow-xl border border-slate-100"
+        className="w-[400px] p-5 bg-app-white rounded-2xl shadow-xl border border-app-slate-100"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <div className="text-sm text-muted-foreground">
@@ -184,7 +184,7 @@ function AuthPopover() {
               className="flex flex-col gap-5"
             >
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-app-slate-700">
                   Email
                 </label>
                 <ValidatedInput
@@ -200,7 +200,7 @@ function AuthPopover() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-app-slate-700">
                   Password
                 </label>
                 <ValidatedInput
@@ -217,7 +217,7 @@ function AuthPopover() {
 
               <button
                 type="submit"
-                className="mt-2 rounded-lg bg-indigo-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                className="mt-2 rounded-lg bg-app-indigo-600 py-3 font-semibold text-app-white transition-colors duration-200 hover:bg-app-indigo-700 focus:outline-none focus:ring-2 focus:ring-app-indigo-500 focus:ring-offset-2"
               >
                 Login
               </button>
@@ -229,7 +229,7 @@ function AuthPopover() {
               className="flex flex-col gap-5"
             >
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-app-slate-700">
                   Email
                 </label>
                 <ValidatedInput
@@ -245,7 +245,7 @@ function AuthPopover() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-app-slate-700">
                   Password
                 </label>
                 <ValidatedInput
@@ -262,7 +262,7 @@ function AuthPopover() {
 
               <button
                 type="submit"
-                className="mt-2 rounded-lg bg-indigo-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                className="mt-2 rounded-lg bg-app-indigo-600 py-3 font-semibold text-app-white transition-colors duration-200 hover:bg-app-indigo-700 focus:outline-none focus:ring-2 focus:ring-app-indigo-500 focus:ring-offset-2"
               >
                 Register
               </button>

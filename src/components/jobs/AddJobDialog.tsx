@@ -124,11 +124,11 @@ function AddJobDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-[425px] rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl shadow-slate-200/50"
+        className="sm:max-w-[425px] rounded-2xl border border-app-slate-200 bg-app-white p-6 shadow-xl shadow-slate-200/50"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader className="mb-4">
-          <DialogTitle className="text-xl font-bold tracking-tight text-[#0f172a]">
+          <DialogTitle className="text-xl font-bold tracking-tight text-app-slate-900">
             {job ? "Edit job" : "Add job"}
           </DialogTitle>
         </DialogHeader>
@@ -178,7 +178,7 @@ function AddJobDialog({
                 id="status"
                 value={status}
                 onChange={(event) => setStatus(event.target.value as JobStatus)}
-                className="w-full appearance-none rounded-lg border border-slate-200 px-3.5 py-2.5 pr-10 text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full appearance-none rounded-lg border border-slate-200 px-3.5 py-2.5 pr-10 text-app-slate-900 placeholder-app-slate-400 outline-none transition-all focus:border-app-indigo-500 focus:ring-2 focus:ring-app-indigo-500/20"
               >
                 <option value="applied">Applied</option>
                 <option value="interview">Interview</option>
@@ -211,7 +211,7 @@ function AddJobDialog({
 
           <button
             type="submit"
-            className="w-full mt-2 rounded-lg bg-[#0ea5e9] py-3 font-semibold text-white transition-colors duration-200 hover:bg-[#0284c7] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9] focus:ring-offset-2"
+            className="w-full mt-2 rounded-lg bg-app-sky-500 py-3 font-semibold text-app-white transition-colors duration-200 shadow-sm shadow-sky-500/10 hover:bg-app-sky-600 focus:outline-none focus:ring-2 focus:ring-app-sky-500 focus:ring-offset-2"
           >
             Save
           </button>

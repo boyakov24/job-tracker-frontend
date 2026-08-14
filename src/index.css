@@ -8,6 +8,46 @@
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: 'Geist Variable', sans-serif;
+
+    --color-app-bg-color: var(--app-bg-color);
+    --color-app-white: var(--app-white);
+    --color-app-slate-50: var(--app-slate-50);
+    --color-app-slate-100: var(--app-slate-100);
+    --color-app-slate-200: var(--app-slate-200);
+    --color-app-slate-400: var(--app-slate-400);
+    --color-app-slate-500: var(--app-slate-500);
+    --color-app-slate-600: var(--app-slate-600);
+    --color-app-slate-700: var(--app-slate-700);
+    --color-app-slate-800: var(--app-slate-800);
+    --color-app-slate-900: var(--app-slate-900);
+
+    --color-app-sky-500: var(--app-sky-500);
+    --color-app-sky-600: var(--app-sky-600);
+
+    --color-app-hover-sky: var(--app-hover-sky);
+
+    --color-app-indigo-500: var(--app-indigo-500);
+    --color-app-indigo-600: var(--app-indigo-600);
+    --color-app-indigo-700: var(--app-indigo-700);
+
+    --color-app-hover-indigo: var(--app-hover-indigo);
+
+    --color-app-emerald-400: var(--app-emerald-400);
+    --color-app-emerald-500: var(--app-emerald-500);
+
+    --color-app-hover-emerald: var(--app-hover-emerald);
+
+    --color-app-rose-50: var(--app-rose-50);
+    --color-app-rose-200: var(--app-rose-200);
+    --color-app-rose-400: var(--app-rose-400);
+    --color-app-rose-500: var(--app-rose-500);
+    --color-app-rose-600: var(--app-rose-600);
+
+    --color-app-hover-rose: var(--app-hover-rose);
+
+    --color-app-hover-amber: var(--app-hover-amber);
+
+
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -73,6 +113,45 @@
     --chart-4: oklch(0.371 0 0);
     --chart-5: oklch(0.269 0 0);
     --radius: 0.625rem;
+
+    --app-bg-color: #ffffff;
+    --app-white: #ffffff; /**/
+    --app-slate-50: #f8fafc;   /**/
+    --app-slate-100: #f1f5f9; /**/
+    --app-slate-200: #e2e8f0; /**/
+    --app-slate-400: #94a3b8; /**/
+    --app-slate-500: #64748b; /**/
+    --app-slate-600: #475569; /**/
+    --app-slate-700: #334155; /**/
+    --app-slate-800: #1e293b; /**/
+    --app-slate-900: #0f172a; /**/
+
+    --app-sky-500: #0ea5e9; /**/
+    --app-sky-600: #0284c7; /**/
+
+    --app-hover-sky: rgba(14, 165, 233, 0.3);
+
+    --app-indigo-500: #6366f1; /**/
+    --app-indigo-600: #4f46e5; /**/
+    --app-indigo-700: #4338ca; /**/
+
+    --app-hover-indigo: rgba(79, 70, 229, 0.3);
+
+    --app-emerald-400: #34d399; /**/
+    --app-emerald-500: #10b981; /**/
+
+    --app-hover-emerald: rgba(52, 211, 153, 0.2);
+
+    --app-rose-50: #ffe4e6; /**/
+    --app-rose-200: #fecdd3; /**/
+    --app-rose-400: #fb7185; /**/
+    --app-rose-500: #f43f5e;
+    --app-rose-600: #e11d48; /**/
+
+    --app-hover-rose: rgba(253, 125, 125, 0.3);
+
+    --app-hover-amber:rgba(217, 119, 6, 0.3); /**/
+
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-primary: oklch(0.205 0 0);
@@ -107,6 +186,44 @@
     --chart-3: oklch(0.439 0 0);
     --chart-4: oklch(0.371 0 0);
     --chart-5: oklch(0.269 0 0);
+
+    --app-bg-color: #040a32;
+    --app-white: #0f172a;
+    --app-slate-50: #090d16;
+    --app-slate-100: #1e293b;
+    --app-slate-200: #334155;
+    --app-slate-400: #64748b;
+    --app-slate-500: #94a3b8;
+    --app-slate-600: #cbd5e1;
+    --app-slate-700: #e2e8f0;
+    --app-slate-800: #f1f5f9;
+    --app-slate-900: #f8fafc;
+
+    --app-sky-500: #0ea5e9;
+    --app-sky-600: #38bdf8;
+
+    --app-hover-sky: #44bef6;
+
+    --app-indigo-500: #818cf8;
+    --app-indigo-600: #a5b4fc;
+    --app-indigo-700: #c7d2fe;
+
+    --app-hover-indigo: #a5b4fc;
+
+    --app-emerald-400: #34d399;
+    --app-emerald-500: #6ee7b7;
+
+    --app-hover-emerald: rgba(52, 211, 153, 0.4);
+
+    --app-rose-50: rgba(186, 40, 57, 0.2);
+    --app-rose-200: #4c0519;
+    --app-rose-400: #fca5a5;
+    --app-rose-600: #fb7185;
+
+    --app-hover-rose: #8a1414;
+
+    --app-hover-amber: #fbbf24;
+
     --sidebar: oklch(0.205 0 0);
     --sidebar-foreground: oklch(0.985 0 0);
     --sidebar-primary: oklch(0.488 0.243 264.376);

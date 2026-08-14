@@ -76,7 +76,7 @@ function JobList({ jobs, onUpdated }: JobListProps) {
   }
 
   return (
-    <div className="mt-8 overflow-x-auto rounded-lg border">
+    <div className="mt-8 overflow-x-auto rounded-lg border bg-app-bg-color">
       <div className="min-w-[700px]">
         <div className="grid grid-cols-4 border-b bg-muted/50 px-4 py-3 text-md font-medium">
           <span>Company</span>
@@ -121,7 +121,7 @@ function JobList({ jobs, onUpdated }: JobListProps) {
                     href={job.applicationUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-1 block text-sm text-indigo-600 hover:underline"
+                    className="mt-1 block text-sm text-app-indigo-600 hover:underline"
                   >
                     {job.applicationUrl}
                   </a>
@@ -148,7 +148,7 @@ function JobList({ jobs, onUpdated }: JobListProps) {
                   <button
                     type="button"
                     onClick={() => setEditingJob(job)}
-                    className="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-[#4f46e5]/10 hover:text-slate-800 transition-colors duration-200"
+                    className="rounded-md px-3 py-1.5 text-sm font-medium text-app-slate-600 hover:bg-app-hover-indigo hover:text-app-slate-800 transition-colors duration-200"
                   >
                     ✏️ Edit
                   </button>
@@ -156,7 +156,7 @@ function JobList({ jobs, onUpdated }: JobListProps) {
                   <button
                     type="button"
                     onClick={() => handleDeleteJob(job.id)}
-                    className="rounded-md px-3 py-1.5 text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors duration-200"
+                    className="rounded-md px-3 py-1.5 text-sm font-medium text-app-rose-600 hover:bg-app-hover-rose transition-colors duration-200"
                   >
                     🗑 Delete
                   </button>

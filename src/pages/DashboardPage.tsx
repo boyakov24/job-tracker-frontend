@@ -9,7 +9,7 @@ function DashboardPage() {
 
   const [isAddJobOpen, setIsAddJobOpen] = useState(false);
   return (
-    <main className="min-h-[calc(100vh-73px)]">
+    <main className="min-h-[calc(100vh-73px)] bg-app-slate-50">
       <div className="mx-auto max-w-6xl px-6 py-10">
         <div className="flex items-center justify-between">
           <div>
@@ -23,7 +23,7 @@ function DashboardPage() {
           <button
             type="button"
             onClick={() => setIsAddJobOpen(true)}
-            className="rounded-md bg-[#0ea5e9] px-4 py-2 text-sm font-medium text-white shadow-sm shadow-sky-500/10 hover:bg-[#0284c7] transition-colors duration-200"
+            className="rounded-md bg-app-sky-500 px-4 py-2 text-sm font-medium text-app-white shadow-sm shadow-sky-500/10 hover:bg-app-sky-600 transition-colors duration-200"
           >
             + Add job
           </button>

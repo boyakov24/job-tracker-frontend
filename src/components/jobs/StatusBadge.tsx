@@ -5,10 +5,10 @@ type StatusBadgeProps = {
 };
 
 const statusStyles: Record<JobStatus, string> = {
-  applied: "bg-slate-100 text-slate-600",
-  interview: "bg-[#4f46e5]/10 text-[#4f46e5]",
-  offer: "bg-[#34d399]/10 text-[#34d399]",
-  rejected: "bg-rose-50 text-rose-600",
+  applied: "bg-app-slate-100 text-app-slate-600",
+  interview: "bg-app-indigo-600/10 text-app-indigo-600",
+  offer: "bg-app-emerald-400/10 text-app-emerald-400",
+  rejected: "bg-app-rose-50 text-app-rose-600",
 };
 
 function StatusBadge({ status }: StatusBadgeProps) {
@@ -19,12 +19,12 @@ function StatusBadge({ status }: StatusBadgeProps) {
       <span
         className={`h-1.5 w-1.5 rounded-full ${
           status === "applied"
-            ? "bg-slate-400"
+            ? "bg-app-slate-400"
             : status === "interview"
-              ? "bg-[#4f46e5]"
+              ? "bg-app-indigo-600"
               : status === "offer"
-                ? "bg-[#34d399]"
-                : "bg-rose-400"
+                ? "bg-app-emerald-400"
+                : "bg-app-rose-400"
         }`}
       />
 
