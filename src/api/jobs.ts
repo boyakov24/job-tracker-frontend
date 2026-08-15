@@ -2,8 +2,14 @@ import { http } from "./http";
 
 import type { Job, JobStatus, JobsResponse } from "@/types/job";
 
-export async function getJobs() {
-  const response = await http.get<JobsResponse>("/jobs");
+export async function getJobs(params?: {
+  page?: number;
+  limit?: number;
+  status?: JobStatus;
+  sortBy?: "createdAt" | "company" | "position" | "status";
+  order?: "asc" | "desc";
+}) {
+  const response = await http.get<JobsResponse>("/jobs", { params });
 
   return response.data;
 }

@@ -3,11 +3,46 @@ import { useState } from "react";
 import JobList from "@/components/jobs/JobList";
 import { useJobs } from "@/hooks/use-jobs";
 import AddJobDialog from "@/components/jobs/AddJobDialog";
+import type { JobStatus } from "@/types/job";
+
+const STATUS_OPTIONS: { value: JobStatus | "all"; label: string }[] = [
+  { value: "all", label: "All Statuses" },
+  { value: "applied", label: "Applied" },
+  { value: "interview", label: "Interview" },
+  { value: "offer", label: "Offer" },
+  { value: "rejected", label: "Rejected" },
+];
 
 function DashboardPage() {
-  const { data, isLoading, isError, error, refetch } = useJobs();
+  const [parameters, setParameters] = useState<{
+    page: number;
+    limit: number;
+    status?: JobStatus;
+    sortBy: "createdAt" | "company" | "position" | "status";
+    order: "asc" | "desc";
+  }>({
+    page: 1,
+    limit: 10,
+    status: undefined,
+    sortBy: "createdAt",
+    order: "desc",
+  });
+
+  const { data, isLoading, isError, error, refetch } = useJobs(parameters);
 
   const [isAddJobOpen, setIsAddJobOpen] = useState(false);
+
+  const updateFilter = (newParameters: Partial<typeof parameters>) => {
+    setParameters((prev) => {
+      const updated = { ...prev, ...newParameters };
+
+      if (!newParameters.page === undefined) {
+        updated.page = 1;
+      }
+      return updated;
+    });
+  };
+
   return (
     <main className="min-h-[calc(100vh-73px)] bg-app-slate-50">
       <div className="mx-auto max-w-6xl px-6 py-10">
@@ -29,6 +64,48 @@ function DashboardPage() {
           </button>
         </div>
 
+        <div className="mt-4 flex items-center justify-between border-b pb-4">
+          <div className="flex items-center gap-3">
+            <label
+              htmlFor="status-filter"
+              className="text-sm font-medium text-muted-foreground"
+            >
+              Filter by status:
+            </label>
+            <select
+              id="status-filter"
+              value={parameters.status ?? "all"}
+              onChange={(e) => {
+                const val = e.target.value;
+                updateFilter({
+                  status: val === "all" ? undefined : (val as JobStatus),
+                });
+              }}
+              className="rounded-md border bg-app-white px-3 py-1.5 text-sm font-medium shadow-sm outline-none transition-colors duration-200 focus:border-app-sky-500 hover:bg-muted"
+            >
+              {STATUS_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mt-4">
+          <span className="text-sm font-medium text-muted-foreground">
+            Per page:
+          </span>
+          <select
+            value={parameters.limit}
+            onChange={(e) => updateFilter({ limit: Number(e.target.value) })}
+            className="rounded-md border bg-app-white px-2 py-1 text-sm outline-none"
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+          </select>
+        </div>
+
         {isLoading && (
           <p className="mt-8 text-muted-foreground">Loading jobs...</p>
         )}
@@ -39,7 +116,20 @@ function DashboardPage() {
           </pre>
         )}
 
-        {data && <JobList jobs={data.data} onUpdated={refetch} />}
+        {data && (
+          <JobList
+            jobs={data.data}
+            meta={{
+              page: data.page,
+              limit: data.limit,
+              total: data.total,
+              totalPages: data.totalPages,
+            }}
+            currentParameters={parameters}
+            onParameterChange={updateFilter}
+            onUpdated={refetch}
+          />
+        )}
       </div>
 
       <AddJobDialog
