@@ -49,7 +49,7 @@ export function JobList({
   const deleteJobMutation = useDeleteJob();
 
   const handleDeleteJob = (jobId: string) => {
-    if (window.confirm("Are you sure you want to delete this job?")) {
+    if (!window.confirm("Are you sure you want to delete this job?")) {
       return;
     }
 
