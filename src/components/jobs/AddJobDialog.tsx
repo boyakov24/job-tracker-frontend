@@ -151,6 +151,7 @@ export function AddJobDialog({ open, onOpenChange, job }: AddJobDialogProps) {
                 setCompany(event.target.value);
                 setCompanyError("");
               }}
+              autoComplete="off"
               placeholder="e.g. Google"
               error={companyError}
             />
@@ -168,6 +169,7 @@ export function AddJobDialog({ open, onOpenChange, job }: AddJobDialogProps) {
                 setPosition(event.target.value);
                 setPositionError("");
               }}
+              autoComplete="off"
               placeholder="e.g. Backend Developer"
               error={positionError}
             />
@@ -209,6 +211,7 @@ export function AddJobDialog({ open, onOpenChange, job }: AddJobDialogProps) {
                 setApplicationUrl(event.target.value);
                 setApplicationUrlError("");
               }}
+              autoComplete="off"
               placeholder="https://..."
               error={applicationUrlError}
             />

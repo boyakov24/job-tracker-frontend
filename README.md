@@ -6,8 +6,7 @@ The project allows users to manage their job applications, track their status, a
 
 ## Live Demo
 
-Frontend:
-<project-url>
+https://job-tracker-frontend-uggq.onrender.com
 
 ## Features
 
@@ -147,6 +146,12 @@ The frontend:
 
 The frontend communicates with the Job Tracker backend API.
 
+Production API:
+https://job-tracker-api-g0bn.onrender.com
+
+Swagger:
+https://job-tracker-api-g0bn.onrender.com/api
+
 The backend is built with:
 
 - NestJS
@@ -162,12 +167,21 @@ src/api/
 
 ## Deployment
 
-The frontend is intended to be deployed as a Vite static application.
+The frontend is intended to be deployed as a Vite static application on Render.
 
-Production deployment can be configured with:
+Build command:
 
-Build command: npm run build
-Publish directory: dist
+```bash
+npm run build
+```
+
+Publish directory:
+
+dist
+
+Production environment variable:
+
+VITE_API_URL=https://job-tracker-api-g0bn.onrender.com
 
 ## Related Project
 
