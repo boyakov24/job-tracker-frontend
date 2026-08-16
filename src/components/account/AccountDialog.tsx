@@ -186,6 +186,8 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
       await deleteAccount();
 
       logout();
+
+      onOpenChange(false);
     } catch (error) {
       console.error("Failed to delete account:", error);
     } finally {
