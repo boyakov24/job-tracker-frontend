@@ -35,7 +35,7 @@ export function DashboardPage() {
     setParameters((prev) => {
       const updated = { ...prev, ...newParameters };
 
-      if (!newParameters.page === undefined) {
+      if (newParameters.page === undefined) {
         updated.page = 1;
       }
       return updated;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 import type { Job, JobStatus } from "@/types/job";
 import { useCreateJob, useUpdateJob } from "@/hooks/use-jobs";
@@ -26,16 +26,14 @@ export function AddJobDialog({ open, onOpenChange, job }: AddJobDialogProps) {
   const [positionError, setPositionError] = useState("");
   const [applicationUrlError, setApplicationUrlError] = useState("");
 
-  const createJobMutation = useCreateJob();
-  const updateJobMutation = useUpdateJob();
+  const [prevJob, setPrevJob] = useState<Job | undefined>(undefined);
+  const [prevOpen, setPrevOpen] = useState(false);
 
-  const isPending = createJobMutation.isPending || updateJobMutation.isPending;
+  if (job !== prevJob || open !== prevOpen) {
+    setPrevJob(job);
+    setPrevOpen(open);
 
-  useEffect(() => {
-    setCompanyError("");
-    setPositionError("");
-    setApplicationUrlError("");
-
+    // Синхронизируем стейт формы прямо во время рендера (без эффектов!)
     if (job) {
       setCompany(job.company);
       setPosition(job.position);
@@ -47,7 +45,15 @@ export function AddJobDialog({ open, onOpenChange, job }: AddJobDialogProps) {
       setStatus("applied");
       setApplicationUrl("");
     }
-  }, [job, open]);
+    setCompanyError("");
+    setPositionError("");
+    setApplicationUrlError("");
+  }
+
+  const createJobMutation = useCreateJob();
+  const updateJobMutation = useUpdateJob();
+
+  const isPending = createJobMutation.isPending || updateJobMutation.isPending;
 
   const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();

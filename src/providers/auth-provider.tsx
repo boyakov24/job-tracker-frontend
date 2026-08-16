@@ -50,7 +50,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const [user, setUser] = useState<UserProfile | null>(null);
 
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(() =>
+    Boolean(getToken()),
+  );
 
   const logout = useCallback(() => {
     removeToken();
@@ -61,14 +63,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     if (!token) {
-      setUser(null);
-      setIsLoading(false);
       return;
     }
 
     const payload = parseJWT(token);
     if (!payload || !payload.exp) {
-      logout();
+      setTimeout(() => logout(), 0);
       return;
     }
 
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const timeUntilExpiration = expiresAt - Date.now();
 
     if (timeUntilExpiration <= 0) {
-      logout();
+      setTimeout(() => logout(), 0);
       return;
     }
 
@@ -84,7 +84,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       logout();
     }, timeUntilExpiration);
 
-    setIsLoading(true);
     getProfile()
       .then((profile) => {
         setUser(profile);
@@ -128,6 +127,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
 

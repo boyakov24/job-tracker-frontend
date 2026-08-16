@@ -4,6 +4,11 @@ Frontend for a job tracking application.
 
 The project allows users to manage their job applications, track their status, add notes, create reminders, and manage their account.
 
+## Live Demo
+
+Frontend:
+<project-url>
+
 ## Features
 
 - User registration and login
@@ -48,32 +53,126 @@ The project allows users to manage their job applications, track their status, a
 
 src/
 ├── api/
-│ ├── generated/ # Generated OpenAPI client
-│ ├── auth.ts # Authentication API
-│ ├── jobs.ts # Jobs API
-│ ├── notes.ts # Notes API
-│ ├── reminders.ts # Reminders API
-│ ├── users.ts # Users API
-│ └── http.ts # Axios instance and interceptors
+│ ├── generated/
+│ ├── auth.ts
+│ ├── jobs.ts
+│ ├── notes.ts
+│ ├── reminders.ts
+│ ├── users.ts
+│ └── http.ts
 │
 ├── components/
-│ ├── account/ # Account management
-│ ├── auth/ # Authentication UI
-│ ├── home/ # Home page components
-│ ├── jobs/ # Job management UI
-│ ├── layout/ # Application layout
-│ ├── notes/ # Notes UI
-│ ├── reminders/ # Reminder UI
-│ └── ui/ # Reusable UI components
+│ ├── auth/
+│ ├── account/
+│ ├── home/
+│ ├── jobs/
+│ ├── layout/
+│ ├── notes/
+│ ├── reminders/
+│ └── ui/
 │
-├── hooks/ # React hooks
-├── layouts/ # Application layouts
-├── lib/ # Utilities and authentication storage
-├── pages/ # Application pages
-├── providers/ # Context and React Query providers
-├── routes/ # Route protection
-├── types/ # TypeScript types
-├── assets/ # Static assets
-├── App.tsx #
-├── index.css # Style
-└── main.tsx #
+├── hooks/
+├── layouts/
+├── lib/
+├── pages/
+├── providers/
+├── routes/
+├── types/
+├── App.tsx
+├── index.css
+└── main.tsx
+
+## Installation
+
+### Clone the repository
+
+```bash
+git clone https://github.com/boyakov24/job-tracker-frontend.git
+cd job-tracker-frontend
+```
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Configure environment variables
+
+Create a `.env` file in the project root and fill in the required environment variables.
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+### Available Scripts
+
+Development:
+
+```bash
+npm run dev
+```
+
+Production build:
+
+```bash
+npm run build
+```
+
+Preview production build:
+
+```bash
+npm run preview
+```
+
+OpenAPI client generation:
+
+```bash
+npm run openapi
+```
+
+## Authentication
+
+Authentication is handled using JWT.
+
+The frontend:
+
+- Stores the authentication token locally
+- Sends the token with authenticated API requests
+- Protects the /dashboard route
+- Redirects unauthenticated users away from protected pages
+- Logs the user out when the authentication session becomes invalid
+
+## API
+
+The frontend communicates with the Job Tracker backend API.
+
+The backend is built with:
+
+- NestJS
+- Drizzle ORM
+- PostgreSQL
+- Neon Database
+- JWT
+- Swagger
+
+The frontend API is located in:
+
+src/api/
+
+## Deployment
+
+The frontend is intended to be deployed as a Vite static application.
+
+Production deployment can be configured with:
+
+Build command: npm run build
+Publish directory: dist
+
+## Related Project
+
+This frontend is part of the Job Tracker project and works together with the Job Tracker backend API.
+
+## License
+
+This project is licensed under the MIT License.

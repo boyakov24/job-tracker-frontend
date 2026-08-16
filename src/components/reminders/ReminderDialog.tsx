@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import {
   useReminder,
@@ -32,7 +32,34 @@ export function ReminderDialog({
   const [dateError, setDateError] = useState("");
   const [timeError, setTimeError] = useState("");
 
+  const [prevReminder, setPrevReminder] = useState<typeof reminder>(undefined);
+  const [prevOpen, setPrevOpen] = useState(false);
+
   const { data: reminder } = useReminder(noteId);
+
+  if (reminder !== prevReminder || open !== prevOpen) {
+    setPrevReminder(reminder);
+    setPrevOpen(open);
+
+    if (open) {
+      setDateError("");
+      setTimeError("");
+
+      if (reminder) {
+        const reminderDate = new Date(reminder.remindAt);
+        setDate(reminderDate.toLocaleDateString("en-CA"));
+        setTime(
+          reminderDate.toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        );
+      } else {
+        setDate("");
+        setTime("");
+      }
+    }
+  }
 
   const createReminderMutation = useCreateReminder();
   const updateReminderMutation = useUpdateReminder(noteId);
@@ -44,31 +71,6 @@ export function ReminderDialog({
     deleteReminderMutation.isPending;
 
   const today = new Date().toISOString().split("T")[0];
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    setDateError("");
-    setTimeError("");
-
-    if (reminder) {
-      const reminderDate = new Date(reminder.remindAt);
-
-      setDate(reminderDate.toLocaleDateString("en-CA"));
-
-      setTime(
-        reminderDate.toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      );
-    } else {
-      setDate("");
-      setTime("");
-    }
-  }, [open, reminder]);
 
   const handleDelete = () => {
     if (!reminder) return;
