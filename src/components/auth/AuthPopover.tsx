@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react";
 
 import { login as loginRequest } from "@/api/auth";
 import { useAuth } from "@/providers/auth-provider";
@@ -19,11 +20,15 @@ export function AuthPopover() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [showLogPassword, setShowLogPassword] = useState(false);
+
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
+
+  const [showRegPassword, setShowRegPassword] = useState(false);
 
   const [registerEmailError, setRegisterEmailError] = useState("");
   const [registerPasswordError, setRegisterPasswordError] = useState("");
@@ -36,11 +41,15 @@ export function AuthPopover() {
     setEmail("");
     setPassword("");
 
+    setShowLogPassword(false);
+
     setEmailError("");
     setPasswordError("");
 
     setRegisterEmail("");
     setRegisterPassword("");
+
+    setShowRegPassword(false);
 
     setRegisterEmailError("");
     setRegisterPasswordError("");
@@ -229,16 +238,35 @@ export function AuthPopover() {
                 <label className="text-sm font-medium text-app-slate-700">
                   Password
                 </label>
-                <ValidatedInput
-                  type="password"
-                  placeholder="••••••"
-                  value={password}
-                  onChange={(event) => {
-                    setPassword(event.target.value);
-                    setPasswordError("");
-                  }}
-                  error={passwordError}
-                />
+                <div className="relative">
+                  <ValidatedInput
+                    type={showLogPassword ? "text" : "password"}
+                    placeholder="••••••"
+                    value={password}
+                    onChange={(event) => {
+                      setPassword(event.target.value);
+                      setPasswordError("");
+                    }}
+                    error={passwordError}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowLogPassword((value) => !value)}
+                    className="absolute right-3 top-3 text-app-slate-400 hover:text-app-slate-600"
+                    aria-label={
+                      showLogPassword
+                        ? "Hide current password"
+                        : "Show current password"
+                    }
+                  >
+                    {showLogPassword ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <button
@@ -275,16 +303,35 @@ export function AuthPopover() {
                 <label className="text-sm font-medium text-app-slate-700">
                   Password
                 </label>
-                <ValidatedInput
-                  type="password"
-                  placeholder="••••••"
-                  value={registerPassword}
-                  onChange={(event) => {
-                    setRegisterPassword(event.target.value);
-                    setRegisterPasswordError("");
-                  }}
-                  error={registerPasswordError}
-                />
+                <div className="relative">
+                  <ValidatedInput
+                    type={showRegPassword ? "text" : "password"}
+                    placeholder="••••••"
+                    value={registerPassword}
+                    onChange={(event) => {
+                      setRegisterPassword(event.target.value);
+                      setRegisterPasswordError("");
+                    }}
+                    error={registerPasswordError}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowRegPassword((value) => !value)}
+                    className="absolute right-3 top-3 text-app-slate-400 hover:text-app-slate-600"
+                    aria-label={
+                      showRegPassword
+                        ? "Hide current password"
+                        : "Show current password"
+                    }
+                  >
+                    {showRegPassword ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <button
