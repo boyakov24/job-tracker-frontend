@@ -2,7 +2,7 @@ import axios from "axios";
 import { getToken, removeToken } from "@/lib/auth-storage";
 
 export const http = axios.create({
-  baseURL: "/",
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
