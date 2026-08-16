@@ -64,7 +64,10 @@ function Header() {
               )}
 
               <button
-                onClick={logout}
+                onClick={() => {
+                  setIsAccountOpen(false);
+                  logout();
+                }}
                 className="rounded-md border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
               >
                 Logout

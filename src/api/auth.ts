@@ -1,16 +1,16 @@
 import { http } from "./http";
 
-type RegisterDto = {
+export type RegisterDto = {
   email: string;
   password: string;
 };
 
-type LoginDto = {
+export type LoginDto = {
   email: string;
   password: string;
 };
 
-type AuthResponse = {
+export type AuthResponse = {
   accessToken: string;
 };
 

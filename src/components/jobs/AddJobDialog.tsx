@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
 import type { Job, JobStatus } from "@/types/job";
-import { createJob, updateJob } from "@/api/jobs";
+import { useCreateJob, useUpdateJob } from "@/hooks/use-jobs";
 import {
   Dialog,
   DialogContent,
@@ -14,25 +13,23 @@ import ValidatedInput from "../ui/validated-input";
 type AddJobDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreated: () => void;
   job?: Job;
 };
 
-function AddJobDialog({
-  open,
-  onOpenChange,
-  onCreated,
-  job,
-}: AddJobDialogProps) {
+export function AddJobDialog({ open, onOpenChange, job }: AddJobDialogProps) {
   const [company, setCompany] = useState("");
   const [position, setPosition] = useState("");
   const [applicationUrl, setApplicationUrl] = useState("");
+  const [status, setStatus] = useState<JobStatus>("applied");
 
   const [companyError, setCompanyError] = useState("");
   const [positionError, setPositionError] = useState("");
   const [applicationUrlError, setApplicationUrlError] = useState("");
 
-  const [status, setStatus] = useState<JobStatus>("applied");
+  const createJobMutation = useCreateJob();
+  const updateJobMutation = useUpdateJob();
+
+  const isPending = createJobMutation.isPending || updateJobMutation.isPending;
 
   useEffect(() => {
     setCompanyError("");
@@ -52,7 +49,7 @@ function AddJobDialog({
     }
   }, [job, open]);
 
-  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     let hasError = false;
@@ -71,27 +68,18 @@ function AddJobDialog({
       setPositionError("");
     }
 
-    if (hasError) {
-      return;
-    }
+    if (hasError) return;
 
-    try {
-      if (job) {
-        await updateJob(job.id, {
-          company: company.trim(),
-          position: position.trim(),
-          status,
-          applicationUrl: applicationUrl.trim(),
-        });
-      } else {
-        await createJob({
-          company: company.trim(),
-          position: position.trim(),
-          status,
-          applicationUrl: applicationUrl.trim() || undefined,
-        });
-      }
+    const trimmedUrl = applicationUrl.trim();
 
+    const payload = {
+      company: company.trim(),
+      position: position.trim(),
+      status,
+      applicationUrl: job ? trimmedUrl : trimmedUrl || undefined,
+    };
+
+    const handleSuccess = () => {
       setCompany("");
       setPosition("");
       setStatus("applied");
@@ -102,12 +90,11 @@ function AddJobDialog({
       setApplicationUrlError("");
 
       onOpenChange(false);
-      onCreated();
-    } catch (error) {
+    };
+
+    const handleError = (error: unknown) => {
       if (axios.isAxiosError(error)) {
         const message = error.response?.data?.message;
-
-        console.error("Backend validation:", message);
 
         if (
           Array.isArray(message) &&
@@ -118,6 +105,18 @@ function AddJobDialog({
       } else {
         console.error("Unknown error:", error);
       }
+    };
+
+    if (job) {
+      updateJobMutation.mutate(
+        { jobId: job.id, data: payload },
+        { onSuccess: handleSuccess, onError: handleError },
+      );
+    } else {
+      createJobMutation.mutate(payload, {
+        onSuccess: handleSuccess,
+        onError: handleError,
+      });
     }
   };
 
@@ -211,9 +210,10 @@ function AddJobDialog({
 
           <button
             type="submit"
-            className="w-full mt-2 rounded-lg bg-app-sky-500 py-3 font-semibold text-app-white transition-colors duration-200 shadow-sm shadow-sky-500/10 hover:bg-app-sky-600 focus:outline-none focus:ring-2 focus:ring-app-sky-500 focus:ring-offset-2"
+            disabled={isPending}
+            className="w-full mt-2 rounded-lg bg-app-sky-500 py-3 font-semibold text-app-white transition-colors duration-200 shadow-sm shadow-sky-500/10 hover:bg-app-sky-600 focus:outline-none focus:ring-2 focus:ring-app-sky-500 focus:ring-offset-2 disabled:opacity-5"
           >
-            Save
+            {isPending ? "Saving..." : "Save"}
           </button>
         </form>
       </DialogContent>

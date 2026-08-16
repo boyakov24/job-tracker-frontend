@@ -1,42 +1,144 @@
-import { useState, useEffect } from "react";
-
-import { createNote, updateNote, deleteNote } from "@/api/notes";
+import { useState } from "react";
 import ReminderDialog from "../reminders/ReminderDialog";
-import { getReminder, type Reminder } from "@/api/reminders";
+import { useCreateNote, useUpdateNote, useDeleteNote } from "@/hooks/use-notes";
+import { useReminder } from "@/hooks/use-reminders";
 import type { Note } from "@/types/note";
 
 type NoteListProps = {
   jobId: string;
   notes: Note[];
-  onCreated: () => void;
 };
 
-function NoteList({ jobId, notes, onCreated }: NoteListProps) {
-  const [isCreating, setIsCreating] = useState(false);
+function NoteItem({
+  note,
+  jobId,
+  onEdit,
+  onSetReminder,
+}: {
+  note: Note;
+  jobId: string;
+  onEdit: () => void;
+  onSetReminder: () => void;
+}) {
+  const { data: reminder } = useReminder(note.id);
+  const deleteNoteMutation = useDeleteNote(jobId);
 
-  const [content, setContent] = useState("");
-
-  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
-
-  const [reminderNoteId, setReminderNoteId] = useState<string | null>(null);
-
-  const [reminders, setReminders] = useState<Record<string, Reminder | null>>(
-    {},
-  );
-
-  const handleCreate = async () => {
-    if (!content.trim()) {
+  const handleDelete = () => {
+    if (!window.confirm("Are you sure you want to delete this reminder?")) {
       return;
     }
+    deleteNoteMutation.mutate(note.id);
+  };
 
-    await createNote({
-      jobId,
-      content: content.trim(),
-    });
+  return (
+    <div
+      className={`flex items-start justify-between gap-4 rounded-md border bg-app-bg-color p-3 ${reminder?.sentAt ? "opacity-60" : ""}`}
+    >
+      <div>
+        <p className="text-sm">{note.content}</p>
 
-    setContent("");
-    setIsCreating(false);
-    onCreated();
+        <p className="mt-2 text-xs text-muted-foreground">
+          {new Date(note.createdAt).toLocaleDateString()}
+        </p>
+      </div>
+
+      <div className="flex shrink-0 items-center gap-1 pt-1">
+        {reminder?.sentAt ? (
+          <>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-app-emerald-400/10 px-2.5 py-1 text-sm font-medium text-app-emerald-500">
+              ✓ Completed ·{" "}
+              {new Date(reminder.remindAt).toLocaleString("en-US", {
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              })}
+            </span>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={onEdit}
+              className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-app-hover-indigo transition-colors duration-200"
+              aria-label="Edit note"
+            >
+              <span className="text-md">✏️</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onSetReminder}
+              className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-app-hover-amber transition-colors duration-200"
+              aria-label={reminder ? "Edit reminder" : "Set reminder"}
+            >
+              <span className="text-md">🔔</span>
+            </button>
+
+            {reminder && (
+              <span className="text-xs text-app-slate-500">
+                {new Date(reminder.remindAt).toLocaleString("en-US", {
+                  month: "short",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
+              </span>
+            )}
+          </>
+        )}
+
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={deleteNoteMutation.isPending}
+          className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-app-hover-rose transition-colors duration-200"
+        >
+          <span className="text-md">🗑</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function NoteList({ jobId, notes }: NoteListProps) {
+  const [isCreating, setIsCreating] = useState(false);
+  const [content, setContent] = useState("");
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [reminderNote, setReminderNote] = useState<Note | null>(null);
+
+  const createNoteMutation = useCreateNote();
+  const updateNoteMutation = useUpdateNote(jobId);
+
+  const isPending =
+    createNoteMutation.isPending || updateNoteMutation.isPending;
+
+  const handleSave = () => {
+    if (!content.trim()) return;
+
+    if (editingNoteId) {
+      updateNoteMutation.mutate(
+        { noteId: editingNoteId, content: content.trim() },
+        {
+          onSuccess: () => {
+            setContent("");
+            setEditingNoteId(null);
+          },
+        },
+      );
+    } else {
+      createNoteMutation.mutate(
+        { jobId, content: content.trim() },
+        {
+          onSuccess: () => {
+            setContent("");
+            setIsCreating(false);
+          },
+        },
+      );
+    }
   };
 
   const handleCancel = () => {
@@ -44,52 +146,6 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
     setIsCreating(false);
     setEditingNoteId(null);
   };
-
-  const handleEdit = async (noteId: string) => {
-    if (!content.trim()) {
-      return;
-    }
-
-    await updateNote(noteId, content.trim());
-
-    setContent("");
-    setEditingNoteId(null);
-    onCreated();
-  };
-
-  const handleDelete = async (noteId: string) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this reminder?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    await deleteNote(noteId);
-
-    onCreated();
-  };
-
-  useEffect(() => {
-    const loadReminders = async () => {
-      const results = await Promise.all(
-        notes.map(async (note) => {
-          const reminder = await getReminder(note.id);
-
-          return [note.id, reminder] as const;
-        }),
-      );
-
-      setReminders(Object.fromEntries(results));
-    };
-
-    if (notes.length > 0) {
-      loadReminders();
-    } else {
-      setReminders({});
-    }
-  }, [notes]);
 
   return (
     <div className="space-y-3">
@@ -110,10 +166,9 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
             <div className="flex items-center gap-1.5 pt-2 shrink-0">
               <button
                 type="button"
-                onClick={() =>
-                  editingNoteId ? handleEdit(editingNoteId) : handleCreate()
-                }
-                className="flex h-8 w-8 items-center justify-center rounded-full text-app-emerald-400 hover:bg-app-hover-emerald transition-colors duration-200"
+                onClick={handleSave}
+                disabled={!content || isPending}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-app-emerald-400 hover:bg-app-hover-emerald transition-colors duration-200 disabled:opacity-50"
                 aria-label="Save note"
               >
                 <span className="text-md"> ✓ </span>
@@ -141,93 +196,23 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
       )}
 
       {notes.map((note) => {
-        if (note.id === editingNoteId) {
-          return null;
-        }
+        if (note.id === editingNoteId) return null;
+
         return (
-          <div
+          <NoteItem
             key={note.id}
-            className={`flex items-start justify-between gap-4 rounded-md border bg-app-bg-color p-3 ${reminders[note.id]?.sentAt ? "opacity-60" : ""}`}
-          >
-            <div>
-              <p className="text-sm">{note.content}</p>
-
-              <p className="mt-2 text-xs text-muted-foreground">
-                {new Date(note.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-
-            <div className="flex shrink-0 items-center gap-1 pt-1">
-              {reminders[note.id]?.sentAt ? (
-                <>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-app-emerald-400/10 px-2.5 py-1 text-sm font-medium text-app-emerald-500">
-                    ✓ Completed ·{" "}
-                    {new Date(reminders[note.id]!.remindAt).toLocaleString(
-                      "en-US",
-                      {
-                        month: "short",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: false,
-                      },
-                    )}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setContent(note.content);
-                      setEditingNoteId(note.id);
-                      setIsCreating(false);
-                    }}
-                    className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-app-hover-indigo transition-colors duration-200"
-                    aria-label="Edit note"
-                  >
-                    <span className="text-md">✏️</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setReminderNoteId(note.id)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-app-hover-amber transition-colors duration-200"
-                    aria-label={
-                      reminders[note.id] ? "Edit reminder" : "Set reminder"
-                    }
-                  >
-                    <span className="text-md">🔔</span>
-                  </button>
-
-                  {reminders[note.id] && (
-                    <span className="text-xs text-app-slate-500">
-                      {new Date(reminders[note.id]!.remindAt).toLocaleString(
-                        "en-US",
-                        {
-                          month: "short",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: false,
-                        },
-                      )}
-                    </span>
-                  )}
-                </>
-              )}
-
-              <button
-                type="button"
-                onClick={() => handleDelete(note.id)}
-                className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-app-hover-rose transition-colors duration-200"
-              >
-                <span className="text-md">🗑</span>
-              </button>
-            </div>
-          </div>
+            note={note}
+            jobId={jobId}
+            onEdit={() => {
+              setContent(note.content);
+              setEditingNoteId(note.id);
+              setIsCreating(false);
+            }}
+            onSetReminder={() => setReminderNote(note)}
+          />
         );
       })}
+
       {!isCreating && editingNoteId === null && (
         <button
           type="button"
@@ -237,30 +222,16 @@ function NoteList({ jobId, notes, onCreated }: NoteListProps) {
           + Create Note
         </button>
       )}
-      <ReminderDialog
-        open={reminderNoteId !== null}
-        onOpenChange={(open) => {
-          if (!open) {
-            setReminderNoteId(null);
-          }
-        }}
-        noteId={reminderNoteId ?? ""}
-        reminder={reminderNoteId ? reminders[reminderNoteId] : null}
-        onCreated={async () => {
-          if (!reminderNoteId) {
-            return;
-          }
 
-          const reminder = await getReminder(reminderNoteId);
-
-          setReminders((current) => ({
-            ...current,
-            [reminderNoteId]: reminder,
-          }));
-
-          setReminderNoteId(null);
-        }}
-      />
+      {reminderNote && (
+        <ReminderDialog
+          open={Boolean(reminderNote)}
+          onOpenChange={(open) => {
+            if (!open) setReminderNote(null);
+          }}
+          noteId={reminderNote.id}
+        />
+      )}
     </div>
   );
 }

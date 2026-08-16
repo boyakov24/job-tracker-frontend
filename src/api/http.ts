@@ -27,7 +27,6 @@ http.interceptors.response.use(
       error.config?.url !== "/auth/login"
     ) {
       removeToken();
-      window.location.href = "/";
     }
 
     return Promise.reject(error);

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-
 import {
-  createReminder,
-  updateReminder,
-  deleteReminder,
-  type Reminder,
-} from "@/api/reminders";
+  useReminder,
+  useCreateReminder,
+  useUpdateReminder,
+  useDeleteReminder,
+} from "@/hooks/use-reminders";
+import ValidatedInput from "../ui/validated-input";
 
 import {
   Dialog,
@@ -19,24 +19,39 @@ type ReminderDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   noteId: string;
-  reminder: Reminder | null;
-  onCreated: () => void;
 };
 
-function ReminderDialog({
+export function ReminderDialog({
   open,
   onOpenChange,
   noteId,
-  reminder,
-  onCreated,
 }: ReminderDialogProps) {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+
+  const [dateError, setDateError] = useState("");
+  const [timeError, setTimeError] = useState("");
+
+  const { data: reminder } = useReminder(noteId);
+
+  const createReminderMutation = useCreateReminder();
+  const updateReminderMutation = useUpdateReminder(noteId);
+  const deleteReminderMutation = useDeleteReminder(noteId);
+
+  const isPending =
+    createReminderMutation.isPending ||
+    updateReminderMutation.isPending ||
+    deleteReminderMutation.isPending;
+
+  const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     if (!open) {
       return;
     }
+
+    setDateError("");
+    setTimeError("");
 
     if (reminder) {
       const reminderDate = new Date(reminder.remindAt);
@@ -55,48 +70,76 @@ function ReminderDialog({
     }
   }, [open, reminder]);
 
-  const handleDelete = async () => {
-    if (!reminder) {
-      return;
-    }
+  const handleDelete = () => {
+    if (!reminder) return;
 
-    try {
-      await deleteReminder(reminder.id);
-
-      onOpenChange(false);
-      onCreated();
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("Failed to delete reminder:", error.response?.data);
-      } else {
-        console.error("Unknown error:", error);
-      }
-    }
+    deleteReminderMutation.mutate(reminder.id, {
+      onSuccess: () => {
+        onOpenChange(false);
+      },
+      onError: (error) => {
+        if (axios.isAxiosError(error)) {
+          console.error("Failed to delete reminder:", error.response?.data);
+        } else {
+          console.error("Unknown error:", error);
+        }
+      },
+    });
   };
 
-  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    try {
-      const remindAt = new Date(`${date}T${time}`).toISOString();
+    let hasError = false;
 
-      if (reminder) {
-        await updateReminder(reminder.id, remindAt);
-      } else {
-        await createReminder({
-          noteId,
-          remindAt,
-        });
-      }
+    if (!date.trim()) {
+      setDateError("This field is required");
+      hasError = true;
+    } else {
+      setDateError("");
+    }
 
-      onOpenChange(false);
-      onCreated();
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("Backend validation:", error.response?.data?.message);
-      } else {
-        console.error("Unknown error:", error);
-      }
+    if (!time.trim()) {
+      setTimeError("This field is required");
+      hasError = true;
+    } else {
+      setTimeError("");
+    }
+
+    if (hasError) return;
+
+    const remindAt = new Date(`${date}T${time}`).toISOString();
+
+    if (reminder) {
+      updateReminderMutation.mutate(
+        { reminderId: reminder.id, remindAt },
+        {
+          onSuccess: () => onOpenChange(false),
+          onError: (error) => {
+            if (axios.isAxiosError(error)) {
+              console.error(
+                "Backend validation:",
+                error.response?.data?.message,
+              );
+            }
+          },
+        },
+      );
+    } else {
+      createReminderMutation.mutate(
+        { noteId, remindAt },
+        {
+          onSuccess: () => onOpenChange(false),
+          onError: (error) => {
+            if (axios.isAxiosError(error)) {
+              console.error(
+                "Backend validation:",
+                error.response?.data?.message,
+              );
+            }
+          },
+        },
+      );
     }
   };
 
@@ -118,13 +161,16 @@ function ReminderDialog({
               Date
             </label>
 
-            <input
+            <ValidatedInput
               id="reminder-date"
               type="date"
               value={date}
-              onChange={(event) => setDate(event.target.value)}
-              required
-              className="rounded-lg border border-slate-200 px-3.5 py-2.5 text-app-slate-900 outline-none transition-all focus:border-app-indigo-500 focus:ring-2 focus:ring-app-indigo-500/20"
+              min={today}
+              onChange={(event) => {
+                setDate(event.target.value);
+                setDateError("");
+              }}
+              error={dateError}
             />
           </div>
 
@@ -133,20 +179,23 @@ function ReminderDialog({
               Time
             </label>
 
-            <input
+            <ValidatedInput
               id="reminder-time"
               type="time"
               value={time}
-              onChange={(event) => setTime(event.target.value)}
-              required
-              className="rounded-lg border border-slate-200 px-3.5 py-2.5 text-app-slate-900 outline-none transition-all focus:border-app-indigo-500 focus:ring-2 focus:ring-app-indigo-500/20"
+              onChange={(event) => {
+                setTime(event.target.value);
+                setTimeError("");
+              }}
+              error={timeError}
             />
           </div>
 
           <div className="mt-2 flex gap-2">
             <button
               type="submit"
-              className="flex-1 rounded-lg bg-app-sky-500 py-3 font-semibold text-app-white transition-colors duration-200 hover:bg-app-sky-600 focus:outline-none focus:ring-2 focus:ring-app-sky-500 focus:ring-offset-2"
+              disabled={isPending}
+              className="flex-1 rounded-lg bg-app-sky-500 py-3 font-semibold text-app-white transition-colors duration-200 hover:bg-app-sky-600 focus:outline-none focus:ring-2 focus:ring-app-sky-500 focus:ring-offset-2 dissabled:opacity-50"
             >
               {reminder ? "Update" : "Set"}
             </button>
@@ -155,9 +204,10 @@ function ReminderDialog({
               <button
                 type="button"
                 onClick={handleDelete}
-                className="flex-1 rounded-lg border border-app-rose-200 py-3 font-semibold text-app-rose-600 transition-colors duration-200 hover:bg-app-rose-50"
+                disabled={isPending}
+                className="flex-1 rounded-lg border border-app-rose-200 py-3 font-semibold text-app-rose-600 transition-colors duration-200 hover:bg-app-rose-50 dissabled:opacity-50"
               >
-                Delete
+                {isPending ? "Deleting..." : "Delete"}
               </button>
             )}
           </div>

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import axios from "axios";
+
 import { login as loginRequest } from "@/api/auth";
 import { useAuth } from "@/providers/auth-provider";
 import { register as registerRequest } from "@/api/auth";
@@ -10,8 +12,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-function AuthPopover() {
+export function AuthPopover() {
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +31,22 @@ function AuthPopover() {
   const { login } = useAuth();
 
   const [mode, setMode] = useState<"login" | "register">("login");
+
+  const resetPopoverState = () => {
+    setEmail("");
+    setPassword("");
+
+    setEmailError("");
+    setPasswordError("");
+
+    setRegisterEmail("");
+    setRegisterPassword("");
+
+    setRegisterEmailError("");
+    setRegisterPasswordError("");
+
+    setIsLoading(false);
+  };
 
   async function handleLogin(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -54,11 +73,10 @@ function AuthPopover() {
       setPasswordError("");
     }
 
-    if (hasError) {
-      return;
-    }
+    if (hasError) return;
 
     try {
+      setIsLoading(true);
       const response = await loginRequest({
         email,
         password,
@@ -66,10 +84,21 @@ function AuthPopover() {
 
       login(response.accessToken);
       setOpen(false);
+      //resetPopoverState();
     } catch (error) {
       console.error("Login failed:", error);
 
-      setPasswordError("Invalid email or password");
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        setPasswordError(
+          Array.isArray(error.response.data.message)
+            ? error.response.data.message[0]
+            : error.response.data.message,
+        );
+      } else {
+        setPasswordError("Invalid email or password");
+      }
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -98,11 +127,10 @@ function AuthPopover() {
       setRegisterPasswordError("");
     }
 
-    if (hasError) {
-      return;
-    }
+    if (hasError) return;
 
     try {
+      setIsLoading(true);
       const response = await registerRequest({
         email: registerEmail,
         password: registerPassword,
@@ -111,26 +139,22 @@ function AuthPopover() {
       login(response.accessToken);
 
       setOpen(false);
+      resetPopoverState();
     } catch (error) {
       console.error("Registration failed:", error);
-
-      setRegisterEmailError("This email is already registered");
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        setRegisterEmailError(
+          Array.isArray(error.response.data.message)
+            ? error.response.data.message[0]
+            : error.response.data.message,
+        );
+      } else {
+        setPasswordError("This email is already registered");
+      }
+    } finally {
+      setIsLoading(false);
     }
   }
-
-  const resetPopoverState = () => {
-    setEmail("");
-    setPassword("");
-
-    setEmailError("");
-    setPasswordError("");
-
-    setRegisterEmail("");
-    setRegisterPassword("");
-
-    setRegisterEmailError("");
-    setRegisterPasswordError("");
-  };
 
   return (
     <Popover
@@ -150,6 +174,7 @@ function AuthPopover() {
             className="rounded-md border mr-2 px-4 py-2 text-app-indigo-600 hover:bg-app-slate-100 transition-colors duration-200"
             onClick={(e) => {
               e.stopPropagation();
+              resetPopoverState();
               setMode("login");
               setOpen(true);
             }}
@@ -162,6 +187,7 @@ function AuthPopover() {
             className="rounded-md bg-app-indigo-600 px-4 py-2 text-app-white hover:bg-app-indigo-700 transition-colors duration-200"
             onClick={(e) => {
               e.stopPropagation();
+              resetPopoverState();
               setMode("register");
               setOpen(true);
             }}
@@ -217,9 +243,10 @@ function AuthPopover() {
 
               <button
                 type="submit"
+                disabled={isLoading}
                 className="mt-2 rounded-lg bg-app-indigo-600 py-3 font-semibold text-app-white transition-colors duration-200 hover:bg-app-indigo-700 focus:outline-none focus:ring-2 focus:ring-app-indigo-500 focus:ring-offset-2"
               >
-                Login
+                {isLoading ? "Logging in..." : "Login"}
               </button>
             </form>
           ) : (
@@ -262,9 +289,10 @@ function AuthPopover() {
 
               <button
                 type="submit"
+                disabled={isLoading}
                 className="mt-2 rounded-lg bg-app-indigo-600 py-3 font-semibold text-app-white transition-colors duration-200 hover:bg-app-indigo-700 focus:outline-none focus:ring-2 focus:ring-app-indigo-500 focus:ring-offset-2"
               >
-                Register
+                {isLoading ? "Registering..." : "Register"}
               </button>
             </form>
           )}

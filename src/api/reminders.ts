@@ -10,7 +10,7 @@ export type Reminder = {
   updatedAt: string;
 };
 
-type CreateReminderData = {
+export type CreateReminderData = {
   noteId: string;
   remindAt: string;
 };
@@ -37,7 +37,6 @@ export async function getReminder(noteId: string): Promise<Reminder | null> {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       return null;
     }
-
     throw error;
   }
 }
@@ -59,6 +58,6 @@ export async function updateReminder(
   return response.data;
 }
 
-export async function deleteReminder(reminderId: string) {
+export async function deleteReminder(reminderId: string): Promise<void> {
   await http.delete(`/reminders/${reminderId}`);
 }

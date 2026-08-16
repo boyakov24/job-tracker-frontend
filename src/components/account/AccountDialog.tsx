@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 
 import {
@@ -77,9 +78,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
       setEmailError("");
     }
 
-    if (hasError) {
-      return;
-    }
+    if (hasError) return;
 
     try {
       setIsUpdatingEmail(true);
@@ -90,10 +89,19 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
 
       updateUser(updatedUser);
       setIsEditingEmail(false);
+      setEmail("");
     } catch (error) {
       console.error("Failed to update email:", error);
 
-      setEmailError("Failed to update email");
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        setEmailError(
+          Array.isArray(error.response.data.message)
+            ? error.response.data.message[0]
+            : error.response.data.message,
+        );
+      } else {
+        setEmailError("Failed to update email");
+      }
     } finally {
       setIsUpdatingEmail(false);
     }
@@ -120,7 +128,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
       setNewPasswordError("This field is required");
       hasError = true;
     } else if (newPassword.length < 6) {
-      setCurrentPasswordError("Password must be at least 6 characters");
+      setNewPasswordError("Password must be at least 6 characters");
       hasError = true;
     } else if (newPassword.trim() === currentPassword.trim()) {
       setNewPasswordError("Required a new password");
@@ -129,9 +137,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
       setNewPasswordError("");
     }
 
-    if (hasError) {
-      return;
-    }
+    if (hasError) return;
 
     try {
       setIsChangingPassword(true);
@@ -149,7 +155,15 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
     } catch (error) {
       console.error("Failed to change password:", error);
 
-      setCurrentPasswordError("Current password is incorrect");
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        setCurrentPasswordError(
+          Array.isArray(error.response.data.message)
+            ? error.response.data.message[0]
+            : error.response.data.message,
+        );
+      } else {
+        setCurrentPasswordError("Current password is incorrect");
+      }
     } finally {
       setIsChangingPassword(false);
     }
@@ -164,9 +178,7 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
       "Are you sure you want to delete your account? This action cannot be undone.",
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
       setIsDeletingAccount(true);
@@ -241,7 +253,6 @@ function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
               <ValidatedInput
                 id="account-email"
                 type="email"
-                //value={email}
                 placeholder="Enter a new email"
                 onChange={(event) => {
                   setEmail(event.target.value);

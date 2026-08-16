@@ -1,7 +1,7 @@
 import { http } from "./http";
 import type { UserProfile } from "./auth";
 
-type UpdateProfileData = {
+export type UpdateProfileData = {
   email: string;
 };
 
@@ -13,7 +13,7 @@ export async function updateProfile(
   return response.data;
 }
 
-type ChangePasswordData = {
+export type ChangePasswordData = {
   currentPassword: string;
   newPassword: string;
 };
@@ -24,6 +24,6 @@ export async function changePassword(data: ChangePasswordData) {
   return response.data;
 }
 
-export async function deleteAccount() {
+export async function deleteAccount(): Promise<void> {
   await http.delete("/users");
 }

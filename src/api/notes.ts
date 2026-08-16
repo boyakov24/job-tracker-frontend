@@ -1,13 +1,12 @@
 import { http } from "./http";
-
 import type { Note } from "@/types/note";
 
-type CreateNoteData = {
+export type CreateNoteData = {
   jobId: string;
   content: string;
 };
 
-export async function getNotes(jobId: string) {
+export async function getNotes(jobId: string): Promise<Note[]> {
   const response = await http.get<Note[]>(`/jobs/${jobId}/notes`);
 
   return response.data;
@@ -38,6 +37,6 @@ export async function updateNote(
   return response.data;
 }
 
-export async function deleteNote(noteId: string) {
+export async function deleteNote(noteId: string): Promise<void> {
   await http.delete(`/notes/${noteId}`);
 }

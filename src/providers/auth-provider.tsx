@@ -1,6 +1,11 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import type { ReactNode } from "react";
-
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+  useCallback,
+} from "react";
 import { getProfile, type UserProfile } from "@/api/auth";
 import { getToken, removeToken, setToken } from "@/lib/auth-storage";
 
@@ -8,6 +13,7 @@ type AuthContextType = {
   token: string | null;
   user: UserProfile | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (token: string) => void;
   logout: () => void;
   updateUser: (user: UserProfile) => void;
@@ -15,49 +21,86 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function parseJWT(token: string) {
+  try {
+    const base64Url = token.split(".")[1];
+
+    if (!base64Url) return null;
+
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join(""),
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
+
 type AuthProviderProps = {
   children: ReactNode;
 };
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [token, setTokenState] = useState<string | null>(getToken());
+  const [token, setTokenState] = useState<string | null>(() => getToken());
+
   const [user, setUser] = useState<UserProfile | null>(null);
+
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const logout = useCallback(() => {
+    removeToken();
+    setTokenState(null);
+    setUser(null);
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     if (!token) {
       setUser(null);
+      setIsLoading(false);
       return;
     }
 
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      const expiresAt = payload.exp * 1000;
-      const timeUntilExpiration = expiresAt - Date.now();
-
-      if (timeUntilExpiration <= 0) {
-        logout();
-        return;
-      }
-
-      const timeoutId = window.setTimeout(() => {
-        logout();
-      }, timeUntilExpiration);
-
-      getProfile()
-        .then((profile) => {
-          setUser(profile);
-        })
-        .catch((error) => {
-          console.error("Failed to load profile:", error);
-        });
-
-      return () => {
-        window.clearTimeout(timeoutId);
-      };
-    } catch {
+    const payload = parseJWT(token);
+    if (!payload || !payload.exp) {
       logout();
+      return;
     }
-  }, [token]);
+
+    const expiresAt = payload.exp * 1000;
+    const timeUntilExpiration = expiresAt - Date.now();
+
+    if (timeUntilExpiration <= 0) {
+      logout();
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      logout();
+    }, timeUntilExpiration);
+
+    setIsLoading(true);
+    getProfile()
+      .then((profile) => {
+        setUser(profile);
+      })
+      .catch((error) => {
+        console.error("Failed to load profile:", error);
+        logout();
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [token, logout]);
 
   function login(newToken: string) {
     setToken(newToken);
@@ -68,21 +111,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(updatedUser);
   }
 
-  function logout() {
-    console.log("🔥 LOGOUT CALLED");
-
-    removeToken();
-    setTokenState(null);
-    setUser(null);
-    window.location.href = "/";
-  }
-
   return (
     <AuthContext.Provider
       value={{
         token,
         user,
         isAuthenticated: Boolean(token),
+        isLoading,
         login,
         logout,
         updateUser,

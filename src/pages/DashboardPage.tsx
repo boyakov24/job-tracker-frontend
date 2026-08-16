@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import JobList from "@/components/jobs/JobList";
 import { useJobs } from "@/hooks/use-jobs";
 import AddJobDialog from "@/components/jobs/AddJobDialog";
@@ -13,7 +12,7 @@ const STATUS_OPTIONS: { value: JobStatus | "all"; label: string }[] = [
   { value: "rejected", label: "Rejected" },
 ];
 
-function DashboardPage() {
+export function DashboardPage() {
   const [parameters, setParameters] = useState<{
     page: number;
     limit: number;
@@ -28,7 +27,7 @@ function DashboardPage() {
     order: "desc",
   });
 
-  const { data, isLoading, isError, error, refetch } = useJobs(parameters);
+  const { data, isLoading, isError, error } = useJobs(parameters);
 
   const [isAddJobOpen, setIsAddJobOpen] = useState(false);
 
@@ -127,16 +126,11 @@ function DashboardPage() {
             }}
             currentParameters={parameters}
             onParameterChange={updateFilter}
-            onUpdated={refetch}
           />
         )}
       </div>
 
-      <AddJobDialog
-        open={isAddJobOpen}
-        onOpenChange={setIsAddJobOpen}
-        onCreated={refetch}
-      />
+      <AddJobDialog open={isAddJobOpen} onOpenChange={setIsAddJobOpen} />
     </main>
   );
 }

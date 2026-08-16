@@ -1,12 +1,10 @@
-import { useState, useEffect } from "react";
-
+import { useState } from "react";
 import StatusBadge from "./StatusBadge";
-import { getNotes } from "@/api/notes";
-import { deleteJob } from "@/api/jobs";
 import NoteList from "../notes/NotesList";
 import AddJobDialog from "./AddJobDialog";
+import { useDeleteJob } from "@/hooks/use-jobs";
+import { useNotes } from "@/hooks/use-notes";
 import type { Job, JobStatus } from "@/types/job";
-import type { Note } from "@/types/note";
 
 type JobListProps = {
   jobs: Job[];
@@ -26,63 +24,42 @@ type JobListProps = {
   onParameterChange: (
     parameters: Partial<JobListProps["currentParameters"]>,
   ) => void;
-  onUpdated: () => void;
 };
 
-function JobList({
+function JobNotesSection({ jobId }: { jobId: string }) {
+  const { data: notes, isLoading } = useNotes(jobId);
+
+  if (isLoading) {
+    return <p className="text-sm text-muted-foreground">Loading notes...</p>;
+  }
+
+  return <NoteList jobId={jobId} notes={notes ?? []} />;
+}
+
+export function JobList({
   jobs,
   meta,
   currentParameters,
   onParameterChange,
-  onUpdated,
 }: JobListProps) {
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
 
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [isLoadingNotes, setIsLoadingNotes] = useState(false);
-
   const [editingJob, setEditingJob] = useState<Job | null>(null);
 
-  const loadNotes = async (jobId: string) => {
-    setIsLoadingNotes(true);
+  const deleteJobMutation = useDeleteJob();
 
-    try {
-      const data = await getNotes(jobId);
-      setNotes(data);
-    } finally {
-      setIsLoadingNotes(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!expandedJobId) {
-      setNotes([]);
+  const handleDeleteJob = (jobId: string) => {
+    if (window.confirm("Are you sure you want to delete this job?")) {
       return;
     }
 
-    loadNotes(expandedJobId);
-  }, [expandedJobId]);
-
-  const handleDeleteJob = async (jobId: string) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this job?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      await deleteJob(jobId);
-
-      if (expandedJobId === jobId) {
-        setExpandedJobId(null);
-      }
-
-      onUpdated();
-    } catch (error) {
-      console.error("Failed to delete job:", error);
-    }
+    deleteJobMutation.mutate(jobId, {
+      onSuccess: () => {
+        if (expandedJobId === jobId) {
+          setExpandedJobId(null);
+        }
+      },
+    });
   };
 
   const handleSort = (
@@ -98,18 +75,14 @@ function JobList({
   };
 
   const renderSortIcon = (column: typeof currentParameters.sortBy) => {
-    const baseClass = "text-md ml-1.5";
-
-    const chosenClass = "text-xs ml-1.5";
-
     if (currentParameters.sortBy !== column) {
-      return <span className={`${baseClass}`}>↕</span>;
+      return <span className="text-md ml-1.5">↕</span>;
     }
 
     return currentParameters.order === "asc" ? (
-      <span className={`${chosenClass}`}>▼</span>
+      <span className="text-xs ml-1.5">▼</span>
     ) : (
-      <span className={`${chosenClass}`}>▲</span>
+      <span className="text-xs ml-1.5">▲</span>
     );
   };
 
@@ -213,17 +186,7 @@ function JobList({
                     )}
 
                     <div className="mt-6">
-                      {isLoadingNotes ? (
-                        <p className="text-sm text-muted-foreground">
-                          Loading notes...
-                        </p>
-                      ) : (
-                        <NoteList
-                          jobId={job.id}
-                          notes={notes}
-                          onCreated={() => loadNotes(job.id)}
-                        />
-                      )}
+                      <JobNotesSection jobId={job.id} />
                     </div>
                     <div className="mt-6 flex justify-end gap-2 border-t pt-4">
                       <button
@@ -236,9 +199,12 @@ function JobList({
                       <button
                         type="button"
                         onClick={() => handleDeleteJob(job.id)}
+                        disabled={deleteJobMutation.isPending}
                         className="rounded-md px-3 py-1.5 text-sm font-medium text-app-rose-600 hover:bg-app-hover-rose transition-colors duration-200"
                       >
-                        🗑 Delete
+                        {deleteJobMutation.isPending
+                          ? "Deleting..."
+                          : "🗑 Delete"}
                       </button>
                     </div>
                   </div>
@@ -281,10 +247,6 @@ function JobList({
         open={editingJob !== null}
         onOpenChange={(open) => {
           if (!open) setEditingJob(null);
-        }}
-        onCreated={() => {
-          setEditingJob(null);
-          onUpdated();
         }}
         job={editingJob ?? undefined}
       />
